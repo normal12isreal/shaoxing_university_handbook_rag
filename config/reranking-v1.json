@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "model": "qwen3.7-text-rerank",
+  "text_field": "retrieval_text",
+  "top_n": 5,
+  "instruct": "Given a web search query, retrieve relevant passages that answer the query.",
+  "timeout_seconds": 30,
+  "max_attempts": 3,
+  "max_requests_per_run": 24
+}

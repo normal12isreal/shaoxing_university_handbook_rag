@@ -170,7 +170,7 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 如果输入、服务地址、模型、维度或批大小变化，原目录会拒绝继续混写。可以用 `--output output/embeddings-v2` 另存一版；这会重新请求新目录中尚无的全部向量。未来用户问题必须采用与文档相同的模型与维度，按模型推荐的查询编码方式生成查询向量。生成的向量目录被 Git 忽略，避免大量浮点数据进入代码提交；原分块和可复现规则仍受版本控制。
 
-## 实际问题检索：精确余弦 Top-K
+## 实际问题检索：向量召回 10 块，再重排返回 5 块
 
 2026-10-20 检查用户运行的 `output/embeddings-v1/`：状态为 `completed`，266 个 1024 维向量、27 批，已保存批次报告用量 82,848 Token。批次校验和、输入哈希、维度、块 ID 顺序及汇总向量文件均通过只读检查，不重新计算文档向量。
 
@@ -179,11 +179,17 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 ```powershell
 .\.venv\Scripts\python.exe .\scripts\retrieve_chunks.py --question "本科生在图书馆最多能借几本书，借期多少天，可以续借多久？" --top-k 10
 
-# 可选：为排名第一的命中补上已关联正文/表格，仍受原有 4 块/6000 字符限制
+# 默认先召回 10 块，再重排返回前 5 块
+.\.venv\Scripts\python.exe .\scripts\retrieve_chunks.py --question "申请国家奖学金，需要满足哪些条件？"
+
+# 可选：为重排后的第一名补上已关联正文/表格，仍受原有 4 块/6000 字符限制
 .\.venv\Scripts\python.exe .\scripts\retrieve_chunks.py --question "百分制成绩95到99分，对应的绩点是多少？" --top-k 10 --expand-top 1
 
-# 相同问题可强制只使用本地查询缓存，未命中过缓存则报错，不调用 API
+# 相同问题可强制只使用本地查询和重排缓存，任一步没有缓存则报错
 .\.venv\Scripts\python.exe .\scripts\retrieve_chunks.py --question "百分制成绩95到99分，对应的绩点是多少？" --offline
+
+# 对照实验：明确关闭重排，恢复原来的余弦 Top-10
+.\.venv\Scripts\python.exe .\scripts\retrieve_chunks.py --question "申请国家奖学金，需要满足哪些条件？" --no-rerank
 ```
 
 实现流程：
@@ -192,9 +198,14 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 2. 每个新问题调用同一 `qwen3.7-text-embedding` 模型，返回 1024 维查询向量。目前采用与既有兼容接口相同的纯文本编码，没有添加任务指令，也未启用 DashScope 原生 `text_type=query`。这种配置是可运行的首版基线，不代表已经完成查询编码方式的比较。
 3. 计算 `cosine(q,d) = dot(q,d) / (norm(q)*norm(d))`；归一化后就是点积。精确扫描全部 266 个向量，按得分降序取前 10，相同得分按源分块顺序排列。小数据集无需近似索引；相似度取值在 -1 到 1 之间，不是正确率或答案置信度。
 4. 查询向量按语料身份、模型、维度、编码版本和完整问题文字缓存到 `.runtime/query-embeddings-v1/`；同一问题重复使用缓存，报告 `cache_hit=true`、本次 API 尝试次数为 0。不同问法不自动共用缓存。
-5. 默认输出 Top-10 原始命中，不做去重重排、分数阈值过滤或自动扩展；`--expand-top N` 可另外补读前 N 个原始命中（最多 8），不改变原 Top-10 排名。扩展结果单独保存在 `answer_context`，不是把十个命中全部交给原有上限为八个种子的补读函数。
+5. 默认把前 10 个候选的 `retrieval_text` 与问题发送给 `qwen3.7-text-rerank`，按相关性返回前 5 块。不会发送整本正文或重做文档向量。表格的检索文本保留此前关联的简短说明，最终命中仍返回原始 `text`、块 ID 和页码。相同重排分数沿用余弦排名。
+6. `hits` 是最终 5 块，包含 `rank`、`rerank_score`、`cosine_rank` 和 `cosine_similarity`；`vector_candidates` 留存初次召回的 10 块，`reranking.candidate_scores` 留存全部候选重排得分用于对照。两种分数不可直接比较，也不是回答正确概率。固定返回前 5，不做分数阈值过滤，不承诺五块都能用作某项政策的依据。
+7. 重排缓存位于 `.runtime/reranking-v1/`，依据语料身份、服务地址、模型、任务指令、完整问题、候选 ID 顺序及每块输入文本哈希定位，并校验缓存内容。相同输入复用缓存，本次 HTTP 次数和计费用量均为零；候选、配置或文字改变则重新请求。`--offline` 要求查询向量和重排两份缓存都存在。
+8. 默认不扩展关联块；`--expand-top N` 可补读最终重排结果的前 N 块（默认结果最多 5），扩展结果另存在 `answer_context`，不改变五块 `hits`。补读仍受原有硬上限限制。`--no-rerank` 可显式关闭重排以复现余弦基线；重排请求失败会停止，不会悄悄返回余弦结果冒充重排结果。
 
-每次最多 8 个问题、每题 500 字符、Top-K 最大 20，网络尝试次数最多 24；生成回答模型不参与任何步骤。控制台只显示排名、得分、块 ID、物理页码和标题，不打印全部原文或向量。完整结果及命中文本保存在 `output/retrieval-v1/last_run.json`，该目录被 Git 忽略。
+每次最多 8 个问题、每题 500 字符、`--top-k` 表示初次召回候选数（默认 10，最大 20）；查询 Embedding 和重排各最多 24 次 HTTP 尝试。重排配置在 `config/reranking-v1.json`，默认 `top_n=5`；候选少于五块时只能返回实际数量。重排每块最多 2000 字符，超时 30 秒，瞬时错误最多尝试三次，401/403 等不重试。沿用本地同一 Key 和北京业务空间，由兼容 Base URL 自动构造 DashScope 原生重排地址，不额外安装 SDK。实现为 `scripts/rerank_api.py`（请求与校验）、`scripts/rerank_chunks.py`（缓存、索引映射与选择）。接口依据：[百炼文本排序 API](https://help.aliyun.com/zh/model-studio/text-rerank-api)。
+
+生成回答模型仍未接入。控制台只显示最终排名、得分、原召回名次、块 ID、物理页码和标题；完整原文在 `output/retrieval-v1/last_run.json`（schema_version=2），该目录被 Git 忽略。API 为全部候选计量，所以请求全部重排分数后在本地选择五块，便于校验每个原始索引与留档，不增加候选输入量。用量记录只包含已收到的成功响应，失败或超时可能仍计费。
 
 实际两题初次测试结果（不是评测集结论）：
 
@@ -203,7 +214,18 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 | 本科生在图书馆最多能借几本书，借期多少天，可以续借多久？ | chunk-0225 | 0.800901 | 193 | 本专科生、继续教育生：20 册，借期 30 天，续借 15 天 |
 | 百分制成绩95到99分，对应的绩点是多少？ | chunk-0024 | 0.710141 | 37 | 百分制 95～99，对应绩点 4.5 |
 
-两次查询 API 各报告 35、31 Token，合计 66 Token。已使用 `--expand-top 1` 验证表格可补齐前后说明；首次实际运行的完整 Top-10、补读结果和用量保存在本机 `output/retrieval-v1/smoke_test.json`。重复两题的离线运行应具有相同排序与得分，且不调用 API。Top-10 只保证按向量得分排序，末尾可能包含不相关内容；后续应增加真实问题集，再评估重排、关键词检索融合或拒答策略。算法参考：[百炼语义搜索示例](https://help.aliyun.com/zh/model-studio/embedding)。
+上述为接入重排前的基线：两次查询 API 各报告 35、31 Token，合计 66 Token。已使用 `--expand-top 1` 验证表格可补齐前后说明；完整 Top-10、补读结果和用量保存在本机 `output/retrieval-v1/smoke_test.json`。如今复现该基线须加 `--no-rerank`。余弦算法参考：[百炼语义搜索示例](https://help.aliyun.com/zh/model-studio/embedding)。
+
+2026-10-20 重排实际验证：
+
+| 问题 | 重排后的五个块（依次） | 重排报告 Token |
+| --- | --- | --- |
+| 申请国家奖学金，需要满足哪些条件？ | 0157、0156、0162、0146、0171 | 2272 |
+| 申请国家励志奖学金，需要满足哪些条件？ | 0162、0146、0156、0157、0160 | 2205 |
+
+编号均带 `chunk-` 前缀。国家奖学金的成绩要求块 0157（0.963081）和国籍、年级等条件块 0156（0.939879）均进入前二；励志奖学金的主要申请条件块 0162（0.958078）仍为第一。两次重排合计 4477 Token；按当日北京原价 0.5 元/百万输入 Token 算，约 0.00224 元，实际扣费取决于免费额度等账户情况（[官方价格](https://help.aliyun.com/zh/model-studio/model-pricing)）。已有查询向量缓存，本次没有新的查询 Embedding 用量。结果在本机 `output/retrieval-v1/rerank_smoke_test.json`；离线重复验证相同排序且两阶段均无 HTTP 请求。
+
+两题的前五仍混入其他奖项，说明重排没有彻底排除相近政策；当前按要求固定返回五块，不自行加入政策过滤。后续生成回答时必须分辨适用奖项与条款，不能把五块中的所有条件拼起来当成同一政策。此结果仅为功能验证，不是准确率评测。
 
 本次实测文件逻辑大小：源码约 48 MiB，运行环境约 561 MiB，按需下载模型约 248 MiB，正式输出约 14 MiB。连同原 PDF、运行缓存和保留的两份重试临时输出，项目约 900 MiB（约 0.88 GiB；不含系统包下载缓存与文件系统分配开销）。模型整包约 818 MiB，但本次只下载实际用到的文件，没有下载整包或 VLM。两份重试输出位于 `.runtime/incomplete-flash-v1*`，不加入 Git；清理请求被自动审批策略阻止，故保留原状。
 
@@ -218,4 +240,4 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 ## 后续学习顺序
 
-当前已完成 Embedding 与精确向量召回，接下来用真实问题检查 Top-K，再学习重排、关键词融合、证据约束下的回答与评测。后续调整分块规则应重跑字符与表格行覆盖校验，再生成对应版本的向量，不能把数字单独分块。当前没有接入外部向量数据库。
+当前已完成 Embedding、精确向量召回和模型重排，接下来用真实问题检查前五结果，再学习关键词融合、证据约束下的回答与评测。后续调整分块规则应重跑字符与表格行覆盖校验，再生成对应版本的向量，不能把数字单独分块。当前没有接入外部向量数据库。
