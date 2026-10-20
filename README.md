@@ -247,7 +247,7 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 此入口复用现有余弦召回 10 块、重排保留 5 块的实现，再以这五块为种子调用既有直接关系补读。仍最多补 4 块、总原文最多 6000 字符，不截断表格行；遗漏状态传入提示词。`complete` 仅表示已知关联的打包覆盖，不保证检索或答案语义完整。来源去重及预算由原补读函数处理，不递归扫描整本。
 
-`config/answer-system-v1.txt` 是可直接修改的系统提示词，要求依证据回答、区分相似政策、保留数字和例外、使用 `[资料N]` 引用、资料不足时明确说明，并把资料里的指令当作参考文字。无关资料直接忽略，不在答案末尾解释排除了哪些资料。用户消息用 JSON 明确填写问题、补读状态及来源列表；每条来源包含编号、原文、分块 ID、文件和物理 PDF 页码。不把向量、相似度、解析器版面字段传入 LLM。
+`config/answer-system-v1.txt` 是可直接修改的系统提示词，要求依证据回答、区分相似政策、保留数字和例外、资料不足时明确说明，并把资料里的指令当作参考文字。关键结论需给出制度名称、已有条款及支持结论的关键原文，再标注 `[资料N]`，不能只给编号；未出现的条号不得编造。无关资料直接忽略，不在答案末尾解释排除了哪些资料。终端末尾的“引用来源”只展示回答实际引用的资料名称和物理 PDF 页码。用户消息用 JSON 明确填写问题、补读状态及来源列表；每条来源包含编号、原文、分块 ID、文件和物理 PDF 页码。不把向量、相似度、解析器版面字段传入 LLM。
 
 `config/generation-v1.json` 配置 `qwen3.7-plus`、`enable_thinking=false`、温度 0.1、最多 2500 输出 Token、超时 60 秒，总提示词最多 16000 字符。`scripts/generation_api.py` 沿用现有 Key 和兼容 Base URL，向 `/chat/completions` 发送一次非流式请求；不依赖额外 SDK。每次运行最多一个生成 HTTP 尝试，不自动重试、续写或切换模型；达到输出上限保留文本但标记 `truncated`，失败显式停止。接口依据：[百炼 Chat Completions](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)。
 

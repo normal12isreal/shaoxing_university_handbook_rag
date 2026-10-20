@@ -99,13 +99,17 @@ def main():
                   citation_audit=citation_audit(result['answer'], len(sources)))
     write_json(output / 'last_run.json', record)
     print(f'问题：{question}\n\n{result["answer"]}')
-    print('\n资料对应：')
-    for source in sources:
-        print(f'[{source["label"]}] {source["chunk_id"]}；PDF 第 {source["pdf_pages"]} 页')
+    audit = record['citation_audit']
+    cited_sources = [source for i, source in enumerate(sources, 1) if i in audit['cited_numbers']]
+    if cited_sources:
+        print('\n引用来源：')
+        for source in cited_sources:
+            title = source['text'].splitlines()[0]
+            pages = '、'.join(map(str, source['pdf_pages']))
+            print(f'[{source["label"]}] {title}；PDF 第 {pages} 页')
     print(f'\n模型：{generation["model"]}；本次生成用量：{result["usage"]}')
     if not result['complete']:
         print('回答达到输出上限，结果不完整；未自动继续请求。')
-    audit = record['citation_audit']
     if audit['unknown_numbers'] or not audit['has_citations']:
         print('回答的引用编号检查未通过，请检查保存的原始结果。')
     print(f'完整记录：{output / "last_run.json"}')
