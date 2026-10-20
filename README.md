@@ -205,7 +205,7 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 每次最多 8 个问题、每题 500 字符、`--top-k` 表示初次召回候选数（默认 10，最大 20）；查询 Embedding 和重排各最多 24 次 HTTP 尝试。重排配置在 `config/reranking-v1.json`，默认 `top_n=5`；候选少于五块时只能返回实际数量。重排每块最多 2000 字符，超时 30 秒，瞬时错误最多尝试三次，401/403 等不重试。沿用本地同一 Key 和北京业务空间，由兼容 Base URL 自动构造 DashScope 原生重排地址，不额外安装 SDK。实现为 `scripts/rerank_api.py`（请求与校验）、`scripts/rerank_chunks.py`（缓存、索引映射与选择）。接口依据：[百炼文本排序 API](https://help.aliyun.com/zh/model-studio/text-rerank-api)。
 
-生成回答模型仍未接入。控制台只显示最终排名、得分、原召回名次、块 ID、物理页码和标题；完整原文在 `output/retrieval-v1/last_run.json`（schema_version=2），该目录被 Git 忽略。API 为全部候选计量，所以请求全部重排分数后在本地选择五块，便于校验每个原始索引与留档，不增加候选输入量。用量记录只包含已收到的成功响应，失败或超时可能仍计费。
+检索入口本身不调用生成模型。控制台只显示最终排名、得分、原召回名次、块 ID、物理页码和标题；完整原文在 `output/retrieval-v1/last_run.json`（schema_version=2），该目录被 Git 忽略。API 为全部候选计量，所以请求全部重排分数后在本地选择五块，便于校验每个原始索引与留档，不增加候选输入量。用量记录只包含已收到的成功响应，失败或超时可能仍计费。
 
 实际两题初次测试结果（不是评测集结论）：
 
@@ -231,6 +231,30 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 `page_idx` 是从 0 开始的物理 PDF 页序；用户看到的物理 PDF 页码为 `page_idx + 1`。正文中印刷的页码是另一套编号，不使用固定偏移作为通用规则。分块以校对版 `reviewed-v1/document.json` 为输入；后续建立索引使用 `linked-v1/chunks.jsonl` 的 `retrieval_text`，回答时按命中 ID 经补读函数取原文，不要继续把原提取版含错的表格用于问答。
 
+## 完整问答：检索依据后生成答案
+
+入口 `scripts/answer_question.py`，在 VS Code 选择项目 `.venv` 解释器直接运行，会提示输入一个问题；命令行用法：
+
+```powershell
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --question "申请国家奖学金，需要满足哪些条件？"
+
+# 查询向量和重排必须有缓存；生成仍发送一次 API 请求
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --question "申请国家奖学金，需要满足哪些条件？" --retrieval-offline
+
+# 完全不调用 API：要求已有检索缓存，只准备并保存提示词
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --question "申请国家奖学金，需要满足哪些条件？" --dry-run
+```
+
+此入口复用现有余弦召回 10 块、重排保留 5 块的实现，再以这五块为种子调用既有直接关系补读。仍最多补 4 块、总原文最多 6000 字符，不截断表格行；遗漏状态传入提示词。`complete` 仅表示已知关联的打包覆盖，不保证检索或答案语义完整。来源去重及预算由原补读函数处理，不递归扫描整本。
+
+`config/answer-system-v1.txt` 是可直接修改的系统提示词，要求依证据回答、区分相似政策、保留数字和例外、使用 `[资料N]` 引用、资料不足时明确说明，并把资料里的指令当作参考文字。用户消息用 JSON 明确填写问题、补读状态及来源列表；每条来源包含编号、原文、分块 ID、文件和物理 PDF 页码。不把向量、相似度、解析器版面字段传入 LLM。
+
+`config/generation-v1.json` 配置 `qwen3.7-plus`、`enable_thinking=false`、温度 0.1、最多 2500 输出 Token、超时 60 秒，总提示词最多 16000 字符。`scripts/generation_api.py` 沿用现有 Key 和兼容 Base URL，向 `/chat/completions` 发送一次非流式请求；不依赖额外 SDK。每次运行最多一个生成 HTTP 尝试，不自动重试、续写或切换模型；达到输出上限保留文本但标记 `truncated`，失败显式停止。接口依据：[百炼 Chat Completions](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)。
+
+发送前将准确提示词与来源保存到 `output/answers-v1/last_run.json`，成功后补入未经改写的回答、实际模型、用量、完成状态和引用编号检查。失败保留 `generation_failed` 状态及尝试次数。目录被 Git 忽略；不保存密钥。生成答案暂不缓存，重新执行通常会再请求一次 LLM；只有查询向量和重排自动复用缓存。引用检查只核对 `[资料N]` 编号是否存在，不自动证明每项结论都有对应依据。
+
+2026-10-20 首次实际问题为“申请国家奖学金，需要满足哪些条件？”。查询和重排均从缓存读取，生成恰好一次，报告输入 1943、输出 682、总计 2625 Token，正常结束未截断。实际送入 5 块、2173 原文字符，无新增关联块；回答引用资料 1（0157，PDF 147–148 页）与资料 2（0156，PDF 146–147 页），整合了国籍年级与成绩要求，并明确未采用混入的其他奖项条件。对照这两块原文抽查了 10%/30%、无不及格、审核盖章与突出表现标准。此为单例功能验证，不代表答案完整性或准确率已评测。
+
 ## 版本与许可
 
 - 上游：[opendatalab/MinerU](https://github.com/opendatalab/MinerU)。
@@ -240,4 +264,4 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 ## 后续学习顺序
 
-当前已完成 Embedding、精确向量召回和模型重排，接下来用真实问题检查前五结果，再学习关键词融合、证据约束下的回答与评测。后续调整分块规则应重跑字符与表格行覆盖校验，再生成对应版本的向量，不能把数字单独分块。当前没有接入外部向量数据库。
+当前已完成 Embedding、精确向量召回、模型重排与依据约束的答案生成。接下来积累真实问题，检查政策混淆、例外遗漏、检索不足与拒答，再评估关键词融合等改进。后续调整分块规则应重跑字符与表格行覆盖校验，再生成对应版本的向量，不能把数字单独分块。当前没有接入外部向量数据库。
