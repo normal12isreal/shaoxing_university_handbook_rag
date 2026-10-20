@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "groups": [
+    {
+      "table_ids": [
+        "pdf-p037-b2"
+      ],
+      "table_chunk_ids": [
+        "chunk-0024"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0023",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0025",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-001",
+      "document_heading_block": "p033/b01",
+      "continuation_group": "grade-points",
+      "context_chunk_ids": [
+        "chunk-0023",
+        "chunk-0025"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p076-b5",
+        "pdf-p077-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0059",
+        "chunk-0060",
+        "chunk-0061"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0058",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-002",
+      "document_heading_block": "p075/b01",
+      "continuation_group": "innovation-credit-standards",
+      "context_chunk_ids": [
+        "chunk-0058"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p078-b1"
+      ],
+      "table_chunk_ids": [
+        "chunk-0063"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0062",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0064",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-003",
+      "document_heading_block": "p075/b01",
+      "continuation_group": "innovation-credit-team-allocation",
+      "context_chunk_ids": [
+        "chunk-0062",
+        "chunk-0064"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p092-b6",
+        "pdf-p093-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0083",
+        "chunk-0084"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0082",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0085",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-004",
+      "document_heading_block": "p089/b01",
+      "continuation_group": "overseas-grade-conversion",
+      "context_chunk_ids": [
+        "chunk-0082",
+        "chunk-0085"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p121-b8",
+        "pdf-p122-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0112",
+        "chunk-0113"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0111",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0114",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-005",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "comprehensive-evaluation-weights",
+      "context_chunk_ids": [
+        "chunk-0111",
+        "chunk-0114"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p128-b2",
+        "pdf-p129-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0123",
+        "chunk-0124"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0115",
+          "rules": [
+            "chapter_title_matches_attachment_title_prefix"
+          ]
+        }
+      ],
+      "group_id": "table-context-006",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "moral-evaluation",
+      "context_chunk_ids": [
+        "chunk-0115"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p130-b2"
+      ],
+      "table_chunk_ids": [
+        "chunk-0125",
+        "chunk-0126"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0117",
+          "rules": [
+            "chapter_title_matches_attachment_title_prefix"
+          ]
+        }
+      ],
+      "group_id": "table-context-007",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "sports-evaluation",
+      "context_chunk_ids": [
+        "chunk-0117"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p131-b2"
+      ],
+      "table_chunk_ids": [
+        "chunk-0127"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0118",
+          "rules": [
+            "chapter_title_matches_attachment_title_prefix"
+          ]
+        }
+      ],
+      "group_id": "table-context-008",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "aesthetic-evaluation",
+      "context_chunk_ids": [
+        "chunk-0118"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p132-b2"
+      ],
+      "table_chunk_ids": [
+        "chunk-0128"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0119",
+          "rules": [
+            "chapter_title_matches_attachment_title_prefix"
+          ]
+        }
+      ],
+      "group_id": "table-context-009",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "labor-evaluation",
+      "context_chunk_ids": [
+        "chunk-0119"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p133-b2",
+        "pdf-p134-b0",
+        "pdf-p135-b0",
+        "pdf-p136-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0129",
+        "chunk-0130",
+        "chunk-0131",
+        "chunk-0132",
+        "chunk-0133",
+        "chunk-0134",
+        "chunk-0135",
+        "chunk-0136",
+        "chunk-0137",
+        "chunk-0138",
+        "chunk-0139"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0120",
+          "rules": [
+            "chapter_title_matches_attachment_title_prefix"
+          ]
+        }
+      ],
+      "group_id": "table-context-010",
+      "document_heading_block": "p121/b00",
+      "continuation_group": "development-evaluation",
+      "context_chunk_ids": [
+        "chunk-0120"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p137-b8",
+        "pdf-p138-b0"
+      ],
+      "table_chunk_ids": [
+        "chunk-0142",
+        "chunk-0143",
+        "chunk-0144"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0141",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0145",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-011",
+      "document_heading_block": "p137/b00",
+      "continuation_group": "student-award-categories",
+      "context_chunk_ids": [
+        "chunk-0141",
+        "chunk-0145"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p158-b8"
+      ],
+      "table_chunk_ids": [
+        "chunk-0178"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0177",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0179",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-012",
+      "document_heading_block": "p158/b01",
+      "continuation_group": "research-paper-awards",
+      "context_chunk_ids": [
+        "chunk-0177",
+        "chunk-0179"
+      ],
+      "has_body_context": true
+    },
+    {
+      "table_ids": [
+        "pdf-p193-b8"
+      ],
+      "table_chunk_ids": [
+        "chunk-0225"
+      ],
+      "bindings": [
+        {
+          "chunk_id": "chunk-0224",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        },
+        {
+          "chunk_id": "chunk-0226",
+          "rules": [
+            "adjacent_body_same_heading_scope"
+          ]
+        }
+      ],
+      "group_id": "table-context-013",
+      "document_heading_block": "p193/b00",
+      "continuation_group": "library-borrowing",
+      "context_chunk_ids": [
+        "chunk-0224",
+        "chunk-0226"
+      ],
+      "has_body_context": true
+    }
+  ],
+  "unresolved_references": [
+    {
+      "chunk_id": "chunk-0065",
+      "attachment_number": "1",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0070",
+      "attachment_number": "1",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0192",
+      "attachment_number": "1",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0192",
+      "attachment_number": "2",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0193",
+      "attachment_number": "3",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0206",
+      "attachment_number": "1",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0207",
+      "attachment_number": "2",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    },
+    {
+      "chunk_id": "chunk-0207",
+      "attachment_number": "3",
+      "reason": "no_table_attachment_with_same_number_in_this_document"
+    }
+  ],
+  "summary": {
+    "chunks": 266,
+    "table_chunks": 31,
+    "context_groups": 13,
+    "groups_with_body_context": 13,
+    "chunks_with_relations": 51,
+    "table_chunks_with_intro": 31,
+    "groups_without_body_context": [],
+    "unresolved_attachment_references": 8,
+    "binding_rules": {
+      "adjacent_body_same_heading_scope": 15,
+      "chapter_title_matches_attachment_title_prefix": 5
+    },
+    "expansion_limits": {
+      "max_seed_chunks": 8,
+      "max_added_chunks": 4,
+      "max_total_chars": 6000,
+      "max_candidates": 64
+    }
+  }
+}

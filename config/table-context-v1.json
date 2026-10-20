@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "max_neighbor_page_gap": 1,
+  "max_intro_chars": 200,
+  "expansion": {
+    "max_seed_chunks": 8,
+    "max_added_chunks": 4,
+    "max_total_chars": 6000,
+    "max_candidates": 64
+  }
+}
