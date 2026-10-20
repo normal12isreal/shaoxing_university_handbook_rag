@@ -1,0 +1,31 @@
+{
+  "status": "completed",
+  "built_at_utc": "2026-10-20T11:44:14.318105+00:00",
+  "source": {
+    "pdf": "data/input/student-handbook-2025.pdf",
+    "sha256": "41e0638b10e2831104e679f7a537647a51d78becef63958dd2790b143ae8793c",
+    "extraction": "output/flash-v1",
+    "review_registry": "data/table_reviews.json",
+    "review_registry_sha256": "ee0d621fde1f76777912523e3da5c5360634411915e8edf8cf1cf1d7bf226f58"
+  },
+  "summary": {
+    "pdf_pages": 244,
+    "reviewed_source_table_blocks": 21,
+    "corrected_source_table_blocks": 5,
+    "subtables": 30,
+    "row_records": 231,
+    "preserved_non_table_blocks": 2078,
+    "checks": [
+      "source PDF hash",
+      "source table hashes",
+      "complete one-to-one table coverage",
+      "named row columns and value types",
+      "all source pages retained",
+      "no HTML tags"
+    ]
+  },
+  "artifact_sha256": {
+    "document.json": "8264d846cd37a58158c3acbaccdc3111a699e0fe07b719fcc53690051bc62075",
+    "tables.json": "4bba2f4c0a8a12a5150962841ea4b2cf7ac83d9a86c793315a4f4531eef24d90"
+  }
+}

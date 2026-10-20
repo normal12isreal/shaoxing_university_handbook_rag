@@ -1,11 +1,15 @@
 # 学生手册 RAG 学习项目
 
-目前只完成第 1 步：使用本地 MinerU 解析 PDF，保留原文、页码和结构化结果。尚未分块、Embedding、建立检索索引或接入生成模型。
+目前完成第 1 步的本地文档解析及已识别表格的逐页校对。尚未分块、Embedding、建立检索索引或接入生成模型。
 
 ## 当前结果
 
+- **后续使用的全文数据：`output/reviewed-v1/document.json`**，244 页，表格已经替换为校对后的 JSON 行记录，正文去除样式标签。
+- **单独的表格数据：`output/reviewed-v1/tables.json`**，21 个源表格块整理为 30 个子表、231 条行记录。
+- 校对数据及来源记录：`data/table_reviews.json`；重建与检查脚本：`scripts/build_reviewed.py`。
+- 校对版运行检查和输出哈希：`output/reviewed-v1/run.json`。
 - 输入：`data/input/student-handbook-2025.pdf`，从桌面原文件复制，原文件未修改。
-- 整本基础版：`output/flash-v1/markdown.md`，覆盖 244 个物理 PDF 页面。
+- 原始整本基础版：`output/flash-v1/markdown.md`，覆盖 244 个物理 PDF 页面，仅作为提取基线留档。
 - 结构化内容：`output/flash-v1/structured_content.json`。
 - 完整中间协议：`output/flash-v1/middle_json.json`。
 - 原始模型/原生解析输出：`output/flash-v1/model_output.json`。
@@ -15,7 +19,20 @@
 
 `flash-v1` 使用 Flash/TXT，直接读取 PDF 文本层，不运行 OCR 或视觉语言模型。整本解析、保存及结构检查实测约 11 秒，不包含安装和人工质量检查。
 
-**这是一份提取试验基线，尚未验收为可直接用于问答的知识库。** 页数完整只说明页面索引覆盖完整，不能证明所有文字、表格和公式准确。第 37 页（印刷页码 21）的绩点表在基础版中出现数字行合并，需要更高质量解析或针对表格处理；第 82 页（印刷页码 66）的正文与章节顺序经抽查正常。具体记录见 `QUALITY_REVIEW.md`。
+原始提取版仍保留当时的错误。校对版已逐页对照原 PDF 检查全部 21 个已识别表格块，修正或重建其中 5 个块，并展开其余表格的合并单元格、分组和续表关系。第 37 页的绩点映射已拆开，第 128、129、134 页的排版文本已重建成数据，第 133 页的 A/B 类标签顺序已修正。具体范围和边界见 `QUALITY_REVIEW.md`；本轮没有审计可能漏识别的表格，也没有全面校对非表格正文。
+
+## 校对版 JSON 数据格式
+
+`data/table_reviews.json` 是校对内容的编辑入口；两个输出 JSON 是同一份校对数据的自动生成视图。原 PDF 的哈希、原表内容哈希、物理页码、印刷页码和原始内容块索引均保留，避免更新提取基线后误套旧校对。
+
+- `tables.json` 每个表格包含 `title`、`section`、`continuation_group`、`subtables` 和来源信息。
+- 子表以 `columns` 指明字段，以 `rows` 保存按字段命名的行记录；复杂原表按不同表头拆分，续表仍保留各自来源页。
+- `source_notes` 保存原文备注，`editorial_notes` 保存整理说明，两者分别存放。
+- `shared_values` 保存多个项目共用的原表合并单元格。例如六项单项奖共用的 `20%` 不会复制成六条独立比例。
+- 数值、正负号、单位和范围保留为原文字符串；`null` 表示原表该位置不存在，不当成数字 0。
+- `document.json` 按页保存全文内容；`type=table` 的块内 `content` 就是完整表格数据，其他块的 `content` 是去除样式后的原提取内容。原 PDF 和原始图片仍在原目录，不复制到新 JSON。
+
+新校对数据不存 HTML 表格，不创建网页或可视化。它是本项目的数据格式，不冒充 MinerU 的 MiddleJson；原始 MinerU 文件仍保留其原有格式作为溯源基线。
 
 ## 目录
 
@@ -45,6 +62,15 @@ logs/             控制台日志、人工检查用截图，不加入 Git
 
 # 对同一页强制 OCR，区分文本层和图像识别的效果
 .\scripts\extract.ps1 -Tier basic -OcrMode ocr -Pages 37 -OutputName basic-ocr-page37-v2
+
+# 根据校对 JSON 重建全文和表格数据（不调用模型、不联网）
+.\.venv\Scripts\python.exe .\scripts\build_reviewed.py
+
+# 只读检查输出是否与当前校对数据一致
+.\.venv\Scripts\python.exe .\scripts\build_reviewed.py --check
+
+# 检查已对照原图的关键数值与合并单元格约束
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
 执行策略限制 `.ps1` 时，可以只对本次进程运行：
@@ -57,7 +83,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract.ps1 -Outpu
 
 本次实测文件逻辑大小：源码约 48 MiB，运行环境约 561 MiB，按需下载模型约 248 MiB，正式输出约 14 MiB。连同原 PDF、运行缓存和保留的两份重试临时输出，项目约 900 MiB（约 0.88 GiB；不含系统包下载缓存与文件系统分配开销）。模型整包约 818 MiB，但本次只下载实际用到的文件，没有下载整包或 VLM。两份重试输出位于 `.runtime/incomplete-flash-v1*`，不加入 Git；清理请求被自动审批策略阻止，故保留原状。
 
-`page_idx` 是从 0 开始的物理 PDF 页序；用户看到的物理 PDF 页码为 `page_idx + 1`。正文中印刷的页码是另一套编号，后续分块应单独保留，不使用固定偏移作为通用规则。Markdown 便于阅读，后续建立索引应优先消费含页序的结构化 JSON。
+`page_idx` 是从 0 开始的物理 PDF 页序；用户看到的物理 PDF 页码为 `page_idx + 1`。正文中印刷的页码是另一套编号，后续分块应单独保留，不使用固定偏移作为通用规则。后续建立索引应消费 `reviewed-v1/document.json`，不要继续把原提取版含错的表格用于问答。
 
 ## 版本与许可
 
@@ -68,4 +94,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract.ps1 -Outpu
 
 ## 后续学习顺序
 
-先验收提取质量，再研究章节/条款分块、Embedding 和索引、召回、重排、证据约束下的回答与评测。当前没有把尚未检查的提取内容自动导入任何检索系统。
+接下来基于校对版数据研究清洗和章节/条款分块，再学习 Embedding 和索引、召回、重排、证据约束下的回答与评测。表格切分必须保留项目、条件、共用字段、备注和来源，不能把数字单独分块。当前没有自动导入任何检索系统。
