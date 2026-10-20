@@ -1,6 +1,6 @@
 # 学生手册 RAG 学习项目
 
-目前完成本地文档解析、已识别表格的逐页校对、程序化分块及表格上下文关联。尚未进行 Embedding、建立检索索引或接入生成模型。
+目前完成本地文档解析、已识别表格的逐页校对、程序化分块及表格上下文关联。Embedding 接口连通测试通过，批量脚本已备好，整本向量化由用户自行运行；尚未建立检索索引或接入生成回答模型。
 
 ## 当前结果
 
@@ -133,6 +133,43 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract.ps1 -Outpu
 
 脚本通过 MinerU 公开 Python SDK 的 `parse()` 和 `ParseResult.save()` 生成原生结果，不使用大模型改写手册内容。Flash 使用 `ocr_mode=txt`；Basic/Standard 使用 `ocr_mode=auto`。本次没有配置云端文档解析、远程 VLM 或 LLM 后处理。Basic 的模型文件由 ModelScope 下载到本项目 `.runtime/mineru/models/`，解析在本机进行。标准模式还需要额外的 VLM 权重，尚未安装和验证。
 
+## 自行运行 Embedding
+
+`scripts/embed_chunks.py` 使用 Python 标准库发送 HTTPS 请求，不需要额外安装 SDK。2026-10-20 使用用户提供的北京业务空间地址，进行了两次同一短句的连通测试（一次直接请求、一次经正式客户端），每次均返回 `qwen3.7-text-embedding` 的 1024 维向量，各报告 21 Token，合计 42 Token。本轮未发送手册分块，未执行整本向量化。正式客户端的最近一次连通检查约 0.25 秒，单次观测不代表批量吞吐。
+
+用户提供的 API Key 和 Base URL 已存入 `.runtime/dashscope.local.json`，仅在本地保存且被 Git 忽略；程序和运行记录均不写出密钥。环境变量 `DASHSCOPE_API_KEY`、`DASHSCOPE_BASE_URL` 可分别覆盖本地设置。迁移机器时自行配置这两项，不能仅复制仓库后期待密钥也在其中。
+
+在 PowerShell 执行：
+
+```powershell
+Set-Location 'D:\all_try\codex_try\student-handbook-rag'
+
+# 可选：仅检查输入和批次数，不联网、不写输出
+.\.venv\Scripts\python.exe .\scripts\embed_chunks.py --dry-run
+
+# 正式执行：从头开始，或者从上次成功保存的位置继续
+.\.venv\Scripts\python.exe .\scripts\embed_chunks.py
+
+# 完成后只读校验全部批次和汇总文件，不调用 API
+.\.venv\Scripts\python.exe .\scripts\embed_chunks.py --check
+```
+
+也可以先运行 `embed_chunks.py --limit 2`，本次最多处理 2 个新块，然后执行不带 `--limit` 的同一命令完成其余块。用户自行启动的执行才会发送这些手册数据。输入固定为 `output/linked-v1/chunks.jsonl` 的 `retrieval_text`，按文件顺序串行请求，每批 10 个块；266 块的首次完整执行为 27 批。不把全部文字拼成一条，不做改写，不将表格关联补读或问答生成混入向量化步骤。
+
+默认输出目录为 `output/embeddings-v1/`，执行前不会生成整本向量文件：
+
+- `manifest.json`：输入文件哈希、服务地址、模型、维度、字段和批大小，续跑时必须匹配。
+- `batches/000000.json`、`000010.json` 等：按本批首个块的零基位置命名，包含向量、块 ID、位置、输入文字哈希、本批用量和内容校验和。若先小批试跑，文件名可能是 `000000.json`、`000002.json`，仍连续衔接。
+- `run.json`：总块数、已完成块数、`partial/completed` 状态，以及已保存批次的 Token 用量。
+- `vectors.jsonl`：仅在全部完成后，合并为与输入相同顺序的向量数据，一行一个分块，`embedding` 为数字列表；没有重复存正文，使用 `chunk_id` 对接原分块和表格关联。
+- `run.lock`：系统文件锁，阻止两个进程同时写入同一目录；退出或崩溃后由系统释放，不需人工删除锁文件。
+
+每批返回后按 `index` 还原输入顺序，校验数量、模型、维度、数值有限且非零，再通过临时文件与原子替换保存。成功落盘的批次不会重发；Ctrl+C 后执行同一命令续跑。若响应已到但落盘前进程退出，未保存的那一批仍可能需要重发并重复计费；超时和失败请求也可能产生服务端用量，运行记录不能替代实际账单。
+
+参数在 `config/embedding-v1.json`。默认 1024 维、每批 10 条，超时 30 秒，瞬时网络错误、429 和部分 5xx 最多尝试 3 次，401/403 等直接停止。每次运行最多 90 次 HTTP 尝试；输入还受 1000 块、每块 2000 字符、总量 20 万字符的代码上限约束，超限在发送前报错。这些是请求与输入上限，不是账户人民币消费硬限额，也没有查询账户余额。API 格式和模型参数来源：[百炼向量同步接口](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)。
+
+如果输入、服务地址、模型、维度或批大小变化，原目录会拒绝继续混写。可以用 `--output output/embeddings-v2` 另存一版；这会重新请求新目录中尚无的全部向量。未来用户问题必须采用与文档相同的模型与维度，按模型推荐的查询编码方式生成查询向量。生成的向量目录被 Git 忽略，避免大量浮点数据进入代码提交；原分块和可复现规则仍受版本控制。
+
 本次实测文件逻辑大小：源码约 48 MiB，运行环境约 561 MiB，按需下载模型约 248 MiB，正式输出约 14 MiB。连同原 PDF、运行缓存和保留的两份重试临时输出，项目约 900 MiB（约 0.88 GiB；不含系统包下载缓存与文件系统分配开销）。模型整包约 818 MiB，但本次只下载实际用到的文件，没有下载整包或 VLM。两份重试输出位于 `.runtime/incomplete-flash-v1*`，不加入 Git；清理请求被自动审批策略阻止，故保留原状。
 
 `page_idx` 是从 0 开始的物理 PDF 页序；用户看到的物理 PDF 页码为 `page_idx + 1`。正文中印刷的页码是另一套编号，不使用固定偏移作为通用规则。分块以校对版 `reviewed-v1/document.json` 为输入；后续建立索引使用 `linked-v1/chunks.jsonl` 的 `retrieval_text`，回答时按命中 ID 经补读函数取原文，不要继续把原提取版含错的表格用于问答。
@@ -146,4 +183,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract.ps1 -Outpu
 
 ## 后续学习顺序
 
-先检查规则分块的真实样本和粒度，再学习 Embedding 和索引、召回、重排、证据约束下的回答与评测。后续调整分块规则应重跑字符与表格行覆盖校验，不能把数字单独分块。当前没有自动导入任何检索系统。
+先自行运行并检查 Embedding，再学习索引、召回、重排、证据约束下的回答与评测。后续调整分块规则应重跑字符与表格行覆盖校验，再生成对应版本的向量，不能把数字单独分块。当前没有自动导入任何检索系统。
