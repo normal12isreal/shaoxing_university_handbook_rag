@@ -1,0 +1,266 @@
+{
+  "metadata": {
+    "file_suffix": "pdf",
+    "producer": {
+      "name": "mineru",
+      "version": "4.0.12"
+    },
+    "document": {
+      "title": "绍兴文理学院2025年学生手册.doc",
+      "authors": [
+        "Administrator"
+      ],
+      "created_at": "2025-08-19T13:22:13+08:00",
+      "modified_at": "2025-08-19T13:24:24+08:00",
+      "creator_application": "pdfFactory Pro www.fineprint.cn",
+      "producer_application": "pdfFactory Pro 3.50 (Windows 7 Chinese (Simplified))",
+      "page_count": 244,
+      "page_count_kind": "physical"
+    }
+  },
+  "extensions": {
+    "mineru": {
+      "tier": "basic",
+      "parse_mode": "txt"
+    },
+    "docvortex_layout": {
+      "version": 1,
+      "pages": [
+        {
+          "page_idx": 36,
+          "width_pt": 397.0,
+          "height_pt": 576.0
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "page_idx": 36,
+      "blocks": [
+        {
+          "type": "text",
+          "index": 0,
+          "bbox": [
+            0.121,
+            0.113,
+            0.878,
+            0.246
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "第十六条 课程考核成绩由平时成绩（含期中考试、论文、课堂讨论、作业、小测验、出勤等）、实验考核成绩和期末考试成绩综合评定。课程考核成绩可按百分制记分，也可按五级制记分。实验、实习（实践）、设计（论文）等实践性课程的成绩，按五级制记分。",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 1,
+          "bbox": [
+            0.176,
+            0.251,
+            0.753,
+            0.273
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "第十七条 学生的学习质量采用绩点制综合衡量。",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "index": 3,
+          "bbox": [
+            0.125,
+            0.299,
+            0.873,
+            0.52
+          ],
+          "content": [
+            {
+              "type": "table_caption",
+              "index": 2,
+              "bbox": [
+                0.186,
+                0.278,
+                0.636,
+                0.299
+              ],
+              "content": [
+                {
+                  "type": "text",
+                  "content": "（一）课程绩点与考核成绩的对应关系"
+                }
+              ]
+            },
+            {
+              "type": "table_body",
+              "index": 3,
+              "bbox": [
+                0.125,
+                0.299,
+                0.873,
+                0.52
+              ],
+              "image_path": "images/page_36_table_3.jpg",
+              "content": "<table><tbody><tr><td>百分制</td><td>绩点</td><td rowspan=\"6\"></td><td>五级制</td><td>绩点</td></tr><tr><td>10095～9990～94</td><td>54.54</td><td>优</td><td>4.5</td></tr><tr><td>85～8980～84</td><td>3 <sub>3</sub>.5</td><td>良</td><td>3.5</td></tr><tr><td>75～7970～74</td><td>2 <sub>2</sub>.5</td><td>中</td><td>2.5</td></tr><tr><td>65～6960～64</td><td>1 <sub>1</sub>.5</td><td>及格</td><td>1.5</td></tr><tr><td>59分及以下</td><td>0</td><td>不及格</td><td>0</td></tr></tbody></table>"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 4,
+          "bbox": [
+            0.122,
+            0.524,
+            0.876,
+            0.575
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "（二）某门课程的学分绩点，等于该课程的学分数乘以该课程的绩点数。",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 5,
+          "bbox": [
+            0.121,
+            0.579,
+            0.876,
+            0.657
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "（三）平均学分绩点，等于各门课程的学分绩点总和除以各门课程的学分总数。平均学分绩点在计算时应精确到小数点后两位。",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 6,
+          "bbox": [
+            0.121,
+            0.662,
+            0.877,
+            0.767
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "第十八条 学校实行期末考试资格审查制度。任课教师应在期末考试前对学生进行考试资格审查。有下列情况之一者，取消其该课程期末考试资格，该课程成绩记为“",
+              "styles": [
+                "bold"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "0"
+            },
+            {
+              "type": "text",
+              "content": "”分，并取消补考资格:",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 7,
+          "bbox": [
+            0.121,
+            0.772,
+            0.876,
+            0.823
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "（一）一学期内缺课（包括事假、未经批准而缺席等）累计超过该课程本学期学时数三分之一；",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 8,
+          "bbox": [
+            0.184,
+            0.826,
+            0.834,
+            0.849
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "（二）一学期缺交作业（实验报告）达三分之一及以上；",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "index": 9,
+          "bbox": [
+            0.184,
+            0.853,
+            0.875,
+            0.877
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "（三）抄袭他人作业（实验报告）等，经批评教育仍不改正；",
+              "styles": [
+                "bold"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "page_number",
+          "index": 10,
+          "bbox": [
+            0.479,
+            0.92,
+            0.519,
+            0.938
+          ],
+          "content": [
+            {
+              "type": "text",
+              "content": "21"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "is_full_document": false,
+  "schema": "docvortex.middle",
+  "schema_version": "2.0"
+}

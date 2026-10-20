@@ -1,0 +1,54 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-20T11:21:55.650510+00:00",
+  "elapsed_seconds": 10.958,
+  "source_relative_path": "data/input/student-handbook-2025.pdf",
+  "source_sha256": "41e0638b10e2831104e679f7a537647a51d78becef63958dd2790b143ae8793c",
+  "source_pdf_pages": 244,
+  "requested_pages": "all",
+  "parsed_pages": 244,
+  "page_numbering": "page_idx is zero-based physical PDF page; printed page number is separate",
+  "mineru_version": "4.0.12",
+  "docvortex_version": "0.5.16",
+  "mineru_git_commit": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+  "tier": "flash",
+  "ocr_mode": "txt",
+  "execution": "local Python SDK; no remote document or LLM endpoint configured",
+  "markdown_characters": 140096,
+  "top_level_block_types": {
+    "image": 8,
+    "doc_title": 44,
+    "text": 1608,
+    "paragraph_title": 188,
+    "index": 3,
+    "page_number": 222,
+    "table": 21,
+    "header": 5
+  },
+  "pages_without_blocks": [
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    16,
+    30,
+    32,
+    102,
+    104,
+    198,
+    200
+  ],
+  "checks": [
+    "nonempty markdown",
+    "ordered unique pages",
+    "requested full page coverage",
+    "schema round trip"
+  ],
+  "limitations": [
+    "Page coverage does not prove every word was extracted correctly.",
+    "Flash/txt reads the PDF text layer without OCR or VLM; tables, images, formulas and headings need review.",
+    "This is an extraction artifact; RAG chunking, embedding and indexing have not been performed."
+  ]
+}

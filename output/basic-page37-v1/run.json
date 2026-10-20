@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-20T11:23:08.535768+00:00",
+  "elapsed_seconds": 21.188,
+  "source_relative_path": "data/input/student-handbook-2025.pdf",
+  "source_sha256": "41e0638b10e2831104e679f7a537647a51d78becef63958dd2790b143ae8793c",
+  "source_pdf_pages": 244,
+  "requested_pages": "37",
+  "parsed_pages": 1,
+  "page_numbering": "page_idx is zero-based physical PDF page; printed page number is separate",
+  "mineru_version": "4.0.12",
+  "docvortex_version": "0.5.16",
+  "mineru_git_commit": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+  "tier": "basic",
+  "ocr_mode": "auto",
+  "execution": "local Python SDK; no remote document or LLM endpoint configured",
+  "markdown_characters": 932,
+  "top_level_block_types": {
+    "text": 8,
+    "table": 1,
+    "page_number": 1
+  },
+  "pages_without_blocks": [],
+  "checks": [
+    "nonempty markdown",
+    "ordered unique pages",
+    "requested full page coverage",
+    "schema round trip"
+  ],
+  "limitations": [
+    "Page coverage does not prove every word was extracted correctly.",
+    "Model-based extraction still needs source comparison, especially tables and formulas.",
+    "This is an extraction artifact; RAG chunking, embedding and indexing have not been performed."
+  ]
+}
