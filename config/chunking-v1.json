@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "max_body_chars": 1000,
+  "max_heading_chars": 45,
+  "max_repeated_article_intro_chars": 200
+}
