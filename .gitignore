@@ -5,3 +5,4 @@ logs/
 __pycache__/
 *.pyc
 output/embeddings*/
+output/retrieval*/
