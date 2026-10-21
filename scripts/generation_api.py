@@ -5,14 +5,14 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
-import re
-import urllib.error
 import urllib.request
 
 if __package__:
     from .embedding_api import ApiFailure, NoRedirect, validate_base_url
+    from .json_api import post_json
 else:
     from embedding_api import ApiFailure, NoRedirect, validate_base_url
+    from json_api import post_json
 
 
 def load_generation_config(root: Path) -> dict:
@@ -75,29 +75,9 @@ class GenerationClient:
             raise ApiFailure('Generation is limited to one HTTP attempt per run; no automatic retry')
         payload = {k: self.config[k] for k in ('model', 'enable_thinking', 'temperature', 'max_completion_tokens')}
         payload.update(messages=messages, stream=False)
-        request = urllib.request.Request(self.endpoint,
-                    data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
-                    headers={'Authorization': 'Bearer ' + self.api_key, 'Content-Type': 'application/json'},
-                    method='POST')
         self.attempts += 1
+        body = post_json(self.opener, self.endpoint, self.api_key, payload, self.config['timeout_seconds'])
         try:
-            with self.opener.open(request, timeout=self.config['timeout_seconds']) as response:
-                raw = response.read(1_000_001)
-            if len(raw) > 1_000_000:
-                raise ApiFailure('Answer response exceeds 1 MB')
-            try:
-                return validate_chat_response(json.loads(raw), self.config['model'])
-            except (ValueError, TypeError, AttributeError):
-                raise ApiFailure('Invalid answer response; no automatic retry') from None
-        except urllib.error.HTTPError as error:
-            status = error.code
-            raw = error.read(4096)
-            error.close()
-            try:
-                code = json.loads(raw).get('error', {}).get('code', '')
-            except (ValueError, AttributeError):
-                code = ''
-            code = code if isinstance(code, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,80}', code) else 'unknown'
-            raise ApiFailure(f'Answer HTTP {status}; API error code: {code}; no automatic retry') from None
-        except (urllib.error.URLError, TimeoutError, OSError):
-            raise ApiFailure('Answer network or TLS connection failed; no automatic retry') from None
+            return validate_chat_response(body, self.config['model'])
+        except (ValueError, TypeError, AttributeError):
+            raise ApiFailure('Invalid answer response; no automatic retry') from None

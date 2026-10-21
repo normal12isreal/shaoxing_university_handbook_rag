@@ -10,20 +10,24 @@ import sys
 
 if __package__:
     from .context_expansion import expand_context
+    from .crag import apply_crag, load_crag_config
     from .embed_chunks import ROOT, load_config, load_local_credentials
     from .embedding_api import ApiFailure, EmbeddingClient
     from .embedding_store import write_json
     from .generation_api import GenerationClient, load_generation_config
     from .rerank_api import RerankClient, load_rerank_config
     from .retrieve_chunks import load_corpus, run_query
+    from .web_search import WebSearchClient
 else:
     from context_expansion import expand_context
+    from crag import apply_crag, load_crag_config
     from embed_chunks import ROOT, load_config, load_local_credentials
     from embedding_api import ApiFailure, EmbeddingClient
     from embedding_store import write_json
     from generation_api import GenerationClient, load_generation_config
     from rerank_api import RerankClient, load_rerank_config
     from retrieve_chunks import load_corpus, run_query
+    from web_search import WebSearchClient
 
 
 def build_messages(question: str, context: dict, system_prompt: str) -> tuple[list[dict], list[dict]]:
@@ -33,6 +37,8 @@ def build_messages(question: str, context: dict, system_prompt: str) -> tuple[li
     # JSON escaping keeps source text inside explicit fields instead of prompt-template delimiters.
     data = {'用户问题': question.strip(), '上下文补读是否完整': context['complete'],
             '检索资料': sources}
+    if 'evidence_assessment' in context:
+        data['证据评估'] = context['evidence_assessment']
     return [{'role': 'system', 'content': system_prompt},
             {'role': 'user', 'content': json.dumps(data, ensure_ascii=False, indent=2)}], sources
 
@@ -48,7 +54,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--question', help='One question; omitted = prompt once')
     parser.add_argument('--retrieval-offline', action='store_true',
-                        help='Require cached query/reranking; generation still calls the API once')
+                        help='Require cached retrieval; CRAG/web search and answer may still call APIs')
+    parser.add_argument('--no-crag', action='store_true', help='Disable evidence assessment and web fallback')
+    parser.add_argument('--no-web', action='store_true', help='Evaluate evidence but disable web fallback')
     parser.add_argument('--dry-run', action='store_true',
                         help='Use cached retrieval and save the prompt only; no API calls')
     args = parser.parse_args()
@@ -72,15 +80,26 @@ def main():
     limits = json.loads((ROOT / 'config/table-context-v1.json').read_text(encoding='utf-8'))['expansion']
     context = expand_context([h['chunk_id'] for h in retrieval['hits']],
                              {c['chunk_id']: c for c in chunks}, limits)
-    messages, sources = build_messages(question, context, system_prompt)
+    local_context = context
+    crag_report = {'route': 'disabled' if args.no_crag else 'skipped_dry_run'}
+    if not args.no_crag and not args.dry_run:
+        crag_config = load_crag_config(ROOT)
+        evaluator = GenerationClient(base_url, key, {**generation, 'model': crag_config['evaluator_model'],
+                                                     'max_completion_tokens': 500})
+        context, crag_report = apply_crag(question, context, evaluator,
+                WebSearchClient(base_url, key, crag_config),
+                (ROOT / 'config/crag-evaluator-v1.txt').read_text(encoding='utf-8'),
+                allow_web=not args.no_web, max_chars=limits['max_total_chars'])
+    messages, sources = build_messages(question, context, system_prompt) if context['chunks'] else ([], [])
     if sum(len(m['content']) for m in messages) > generation['max_prompt_chars']:
         raise ValueError('Answer prompt exceeds the configured character limit')
     output = ROOT / 'output/answers-v1'
     output.mkdir(parents=True, exist_ok=True)
-    record = {'schema_version': 1, 'run_at_utc': datetime.now(timezone.utc).isoformat(),
+    record = {'schema_version': 2, 'run_at_utc': datetime.now(timezone.utc).isoformat(),
               'question': question, 'vectors_sha256': receipt['vectors_sha256'],
               'retrieval': retrieval, 'answer_context': context, 'sources': sources,
               'messages': messages, 'generation_config': generation, 'answer_model_used': False,
+              'local_context': local_context, 'crag': crag_report,
               'status': 'prepared' if args.dry_run else 'pending'}
     # Save the exact evidence and prompt before sending; failures retain an inspectable record.
     write_json(output / 'last_run.json', record)
@@ -88,13 +107,17 @@ def main():
         print(f'未调用 API；待发送提示词：{output / "last_run.json"}')
         return
     client = GenerationClient(base_url, key, generation)
-    try:
-        result = client.generate(messages)
-    except ApiFailure:
-        record.update(status='generation_failed', generation_http_attempts=client.attempts)
-        write_json(output / 'last_run.json', record)
-        raise
-    record.update(status='completed' if result['complete'] else 'truncated', answer_model_used=True,
+    if messages:
+        try:
+            result = client.generate(messages)
+        except ApiFailure:
+            record.update(status='generation_failed', generation_http_attempts=client.attempts)
+            write_json(output / 'last_run.json', record)
+            raise
+    else:
+        result = {'answer': '现有资料没有提供足够依据，暂时无法确定这个问题的答案。',
+                  'complete': True, 'usage': {}, 'response_model': None, 'finish_reason': 'no_evidence'}
+    record.update(status='completed' if result['complete'] else 'truncated', answer_model_used=bool(messages),
                   generation_http_attempts=client.attempts, generation=result,
                   citation_audit=citation_audit(result['answer'], len(sources)))
     write_json(output / 'last_run.json', record)
@@ -105,12 +128,20 @@ def main():
         print('\n引用来源：')
         for source in cited_sources:
             title = source['text'].splitlines()[0]
-            pages = '、'.join(map(str, source['pdf_pages']))
-            print(f'[{source["label"]}] {title}；PDF 第 {pages} 页')
-    print(f'\n模型：{generation["model"]}；本次生成用量：{result["usage"]}')
+            if source.get('kind') == 'web_search_summary':
+                print(f'[{source["label"]}] {title}')
+                for ref in source['web_sources']:
+                    print(f'  {ref["title"]}：{ref["url"]}')
+            else:
+                pages = '、'.join(map(str, source['pdf_pages']))
+                print(f'[{source["label"]}] {title}；PDF 第 {pages} 页')
+    print(f'\n回答模型：{result["response_model"] or "未调用（依据不足）"}；本次生成用量：{result["usage"]}')
+    if 'assessment' in crag_report:
+        print(f'CRAG：{crag_report["assessment"]["decision"]}；联网：{crag_report["web_search"]["status"]}')
+        print(f'评估用量：{crag_report["evaluator_usage"]}；联网用量：{crag_report["web_search"].get("usage", {})}')
     if not result['complete']:
         print('回答达到输出上限，结果不完整；未自动继续请求。')
-    if audit['unknown_numbers'] or not audit['has_citations']:
+    if audit['unknown_numbers'] or (messages and not audit['has_citations']):
         print('回答的引用编号检查未通过，请检查保存的原始结果。')
     print(f'完整记录：{output / "last_run.json"}')
 

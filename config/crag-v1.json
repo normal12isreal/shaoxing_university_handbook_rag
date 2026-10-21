@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "evaluator_model": "qwen3.7-plus",
+  "web_model": "qwen-plus",
+  "allowed_domains": ["usx.edu.cn", "moe.gov.cn", "mof.gov.cn"],
+  "max_web_chars": 2400,
+  "max_web_sources": 3
+}

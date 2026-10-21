@@ -16,6 +16,7 @@ if __package__:
     from .embedding_store import saved_batches, sha256, write_json
     from .rerank_api import RerankClient, load_rerank_config
     from .rerank_chunks import rerank_hits
+    from .keyword_retrieval import supplement_one
 else:
     from context_expansion import expand_context
     from embed_chunks import ROOT, OUTPUT, identity_for, load_config, load_local_credentials, load_source
@@ -23,6 +24,7 @@ else:
     from embedding_store import saved_batches, sha256, write_json
     from rerank_api import RerankClient, load_rerank_config
     from rerank_chunks import rerank_hits
+    from keyword_retrieval import supplement_one
 
 
 def unit_vector(vector: list[float], dimensions: int) -> list[float]:
@@ -113,9 +115,11 @@ def query_vector(question: str, identity: str, config: dict, cache_dir: Path, cl
 
 def run_query(question, chunks, normalized, identity, config, client, cache_dir,
               *, top_k=10, offline=False, expand_top=0, expansion_limits=None,
-              rerank_config=None, rerank_client=None, rerank_cache_dir=None):
+              rerank_config=None, rerank_client=None, rerank_cache_dir=None, keyword=True):
     if not 1 <= top_k <= 20:
         raise ValueError('top_k must be between 1 and 20')
+    if keyword and top_k > 19:
+        raise ValueError('Use at most 19 vector candidates with keyword supplementation, or --no-keyword')
     final_count = min(top_k, len(chunks), rerank_config['top_n']) if rerank_config else min(top_k, len(chunks))
     if rerank_config and (rerank_client is None or rerank_cache_dir is None):
         raise ValueError('Reranking requires a client and cache directory')
@@ -123,18 +127,26 @@ def run_query(question, chunks, normalized, identity, config, client, cache_dir,
         raise ValueError('expand_top must be between 0 and min(8, final result count)')
     vector, query_info = query_vector(question, identity, config, cache_dir, client, offline=offline)
     hits = cosine_top_k(vector, normalized, chunks, top_k)
+    vector_hits = list(hits)
+    if keyword:
+        hits, keyword_info = supplement_one(question, hits, chunks)
     report = {'question': question.strip(), 'model': config['model'], 'dimensions': config['dimensions'],
               'corpus_identity': identity, 'corpus_chunks': len(chunks), 'algorithm': 'exact_cosine',
               'top_k': top_k, 'query_embedding': query_info, 'hits': hits,
               'score_note': 'Cosine similarity is a ranking score, not an answer probability.',
               'query_encoding': 'compatible_plain_text_v1', 'reranker_used': False,
               'answer_model_used': False}
+    if keyword:
+        report.update(keyword_retrieval=keyword_info, vector_candidates=vector_hits,
+                      algorithm='exact_cosine_plus_keyword')
     if rerank_config:
-        report['vector_candidates'] = hits
+        report['vector_candidates'] = vector_hits
+        report['rerank_candidates'] = hits
         hits, metadata = rerank_hits(question, hits, {c['chunk_id']: c for c in chunks}, identity,
                                      rerank_config, rerank_client, rerank_cache_dir, offline=offline)
         report.update(hits=hits, reranking=metadata, reranker_used=True,
-                      algorithm='exact_cosine_then_rerank', final_top_n=len(hits))
+                      algorithm='exact_cosine_plus_keyword_then_rerank' if keyword else 'exact_cosine_then_rerank',
+                      final_top_n=len(hits))
     if expand_top:
         report['answer_context'] = expand_context([h['chunk_id'] for h in hits[:expand_top]],
                                                    {c['chunk_id']: c for c in chunks}, expansion_limits)
@@ -145,7 +157,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--question', action='append', help='Repeat for up to 8 questions; omitted = prompt once')
     parser.add_argument('--top-k', type=int, default=10, help='Vector candidates before reranking (default 10, max 20)')
-    parser.add_argument('--no-rerank', action='store_true', help='Explicit cosine-only baseline')
+    parser.add_argument('--no-rerank', action='store_true', help='Disable reranking; combine --no-keyword for cosine-only')
+    parser.add_argument('--no-keyword', action='store_true', help='Disable the single keyword supplement')
     parser.add_argument('--expand-top', type=int, default=0, help='Expand final hits separately under existing limits')
     parser.add_argument('--offline', action='store_true', help='Only cached query vectors and reranking; no API calls')
     args = parser.parse_args()
@@ -169,7 +182,7 @@ def main():
                            ROOT / '.runtime/query-embeddings-v1', top_k=args.top_k, offline=args.offline,
                            expand_top=args.expand_top, expansion_limits=limits,
                            rerank_config=rerank_config, rerank_client=rerank_client,
-                           rerank_cache_dir=ROOT / '.runtime/reranking-v1')
+                           rerank_cache_dir=ROOT / '.runtime/reranking-v1', keyword=not args.no_keyword)
         reports.append(report)
         print(f'\n问题：{question}')
         print(f'算法：{report["algorithm"]}；查询缓存：{report["query_embedding"]["cache_hit"]}')
@@ -179,8 +192,10 @@ def main():
         for hit in report['hits']:
             title = hit['text'].splitlines()[0]
             pages = ','.join(map(str, hit['pdf_pages']))
-            score = (f'重排 {hit["rerank_score"]:.6f} / 原召回第 {hit["cosine_rank"]} 名'
-                     if 'rerank_score' in hit else f'余弦 {hit["cosine_similarity"]:.6f}')
+            origin = f'原向量第 {hit["cosine_rank"]} 名' if hit.get('cosine_rank') else '关键词补充'
+            score = (f'重排 {hit["rerank_score"]:.6f} / {origin}' if 'rerank_score' in hit else
+                     f'关键词 {hit["keyword_score"]:.6f}' if 'keyword_score' in hit else
+                     f'余弦 {hit["cosine_similarity"]:.6f}')
             print(f'{hit["rank"]:2d}. {score}  {hit["chunk_id"]}  PDF {pages}  {title}')
         if 'answer_context' in report:
             context = report['answer_context']

@@ -48,7 +48,7 @@ def rerank_hits(question, candidates, chunks_by_id, identity, config, client, ca
     hits = []
     for rank, item in enumerate(ranked[:config['top_n']], 1):
         original = candidates[item['index']]
-        hits.append({**original, 'cosine_rank': original['rank'], 'rank': rank,
+        hits.append({**original, 'cosine_rank': original.get('cosine_rank', original['rank']), 'rank': rank,
                      'rerank_score': item['relevance_score']})
     metadata = {'model': config['model'], 'text_field': config['text_field'],
                 'instruct': config['instruct'], 'candidate_count': len(candidates),
