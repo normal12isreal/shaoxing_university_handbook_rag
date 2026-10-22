@@ -1,0 +1,1176 @@
+{
+  "schema_version": 1,
+  "rules_id": "handbook-eval-10-rules-v1",
+  "execution_status": "not_run",
+  "questions_sha256": "ca4d1e5c7be20e98ee4b2c98380a6e007075ad4e4b7dd1cfeb72fa35e21f6d06",
+  "rules_sha256": "4d4f9ff8a111b550c02345accb56ff86490a92e990641f47780ed538ec2cf949",
+  "summary": {
+    "eligible_retrieval_questions": 8,
+    "answer_questions": 10,
+    "boundary_questions": 2,
+    "retrieval_completed": null,
+    "answer_completed": null,
+    "dense_evidence_recall": null,
+    "merged_evidence_recall": null,
+    "rerank_evidence_recall": null,
+    "mrr_at_5": null,
+    "final_context_evidence_recall": null,
+    "content_mean_score_answerable": null,
+    "content_pass_answerable": null,
+    "grounded_pass_answerable": null,
+    "boundary_pass": null,
+    "pipeline_failed": null
+  },
+  "rows": [
+    {
+      "question_id": "q001",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "只在6月办理。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "把5月和11月提交预计名单的时间当成学位授予办理月份。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q002",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p3",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "期限为15日。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "期限为10个工作日。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "从学校作出决定之日起算而非接到决定书之日。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q003",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p3",
+            "weight": 0,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "每周40小时。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "每月8小时。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "可以为了勤工助学缺课。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q004",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "其他条件优秀即可免除国籍要求。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "不具有中国国籍就不能申请学校任何奖学金。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q005",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p3",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p4",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "只有超过三分之一才取消考试资格。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "仍可正常参加补考。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "该课程成绩记为60分或仅按平时成绩计算。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q006",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "把97分对应为5.0。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "把五级制“良”对应为4.5。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "按表格左右横向位置推定两套成绩等价。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q007",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p3",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p4",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "借书上限30册或5册。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "续借期30天。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "可以不限次数续借。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "逾期以后仍可按本条正常办理续借。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q008",
+      "answerability": "answerable",
+      "retrieval": {
+        "eligible": true,
+        "stages": {
+          "dense_top10": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_run",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p3",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p4",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p5",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "未进入前10%就一律不能申请。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "只要获过竞赛奖即可免除前30%的排名限制。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "证明材料不需要学校审核盖章。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "符合申请条件就必然获得国家奖学金。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q009",
+      "answerability": "not_in_handbook",
+      "retrieval": {
+        "eligible": false,
+        "stages": {
+          "dense_top10": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "未经依据给出具体开闭馆钟点。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "宣称已经查询到最新通知，但本次没有提供外部资料。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "把无法确定误答成图书馆肯定不开放。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    },
+    {
+      "question_id": "q010",
+      "answerability": "needs_clarification",
+      "retrieval": {
+        "eligible": false,
+        "stages": {
+          "dense_top10": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null
+          },
+          "merged_candidates": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "candidate_count": null
+          },
+          "rerank_top5": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "hit": null,
+            "reciprocal_rank": null
+          },
+          "answer_context": {
+            "status": "not_applicable",
+            "chunk_ids": null,
+            "covered_group_ids": null,
+            "missing_group_ids": null,
+            "evidence_recall": null,
+            "all_required_groups_present": null,
+            "context_complete_flag": null
+          }
+        }
+      },
+      "answer": {
+        "status": "not_run",
+        "answer_text": null,
+        "source_labels": null,
+        "points": [
+          {
+            "point_id": "p1",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          },
+          {
+            "point_id": "p2",
+            "weight": 1,
+            "judgment": "not_scored",
+            "value": null,
+            "answer_excerpt": null,
+            "reason": null,
+            "cited_source_labels": null,
+            "citation_support": null
+          }
+        ],
+        "forbidden_claim_checks": [
+          {
+            "claim": "未经确认直接把奖学金理解为国家奖学金。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "只凭大二就断言一定可以申请或一定不可以申请所有奖学金。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          },
+          {
+            "claim": "把缺少个人信息说成整本手册完全没有奖学金规定。",
+            "asserted": null,
+            "answer_excerpt": null,
+            "reason": null
+          }
+        ],
+        "extra_unsupported_claims": null,
+        "hard_error": null,
+        "hard_error_reason": null,
+        "base_score": null,
+        "content_score": null,
+        "content_pass": null,
+        "critical_point_citation_coverage": null,
+        "invalid_citation_labels": null,
+        "grounded_pass": null,
+        "boundary_pass": null,
+        "reviewer": null
+      },
+      "diagnosis": {
+        "failure_stage": null,
+        "reason": null
+      },
+      "usage_and_timing": null
+    }
+  ]
+}

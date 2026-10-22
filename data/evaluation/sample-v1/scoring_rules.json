@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "rules_id": "handbook-eval-10-rules-v1",
+  "status": "ready_not_executed",
+  "dataset_path": "data/evaluation/sample-v1/questions.jsonl",
+  "question_ids": ["q001", "q002", "q003", "q004", "q005", "q006", "q007", "q008", "q009", "q010"],
+  "expand_dataset": false,
+  "retrieval_eligible_ids": ["q001", "q002", "q003", "q004", "q005", "q006", "q007", "q008"],
+  "boundary_ids": ["q009", "q010"],
+  "baseline": {
+    "vector_top_k": 10,
+    "keyword_top_k": 1,
+    "deduplicate_keyword_hit": true,
+    "backfill_duplicate_keyword_hit": false,
+    "rerank_top_n": 5,
+    "expand_related_context": true,
+    "crag_enabled": false,
+    "web_enabled": false,
+    "knowledge_scope": "2025版学生手册；问题本身给出的假设条件也可用于推理",
+    "note": "首轮固定关闭CRAG和联网以隔离基础检索与生成。此处只规定未来执行条件，本轮没有调用业务API。"
+  },
+  "retrieval": {
+    "group_coverage": "All required groups are AND; evidence alternatives within a group are OR. All spans/rows of a selected evidence item must be available, possibly across several complete chunks.",
+    "matching": "For the unchanged corpus, use verified evidence-to-chunk mappings and actual supplied chunk content. Rebuild mappings after chunk changes; unknown alternative evidence requires review, never automatic rejection.",
+    "deduplication": "Repeated chunks and repeated hits of the same evidence group count once.",
+    "stages": [
+      {"id": "dense_top10", "record_field": "retrieval.vector_candidates", "metrics": ["hit", "evidence_recall"]},
+      {"id": "merged_candidates", "record_field": "retrieval.rerank_candidates", "max_count": 11, "metrics": ["candidate_count", "evidence_recall"]},
+      {"id": "rerank_top5", "record_field": "retrieval.hits", "metrics": ["hit", "evidence_recall", "reciprocal_rank"]},
+      {"id": "answer_context", "record_field": "answer_context.chunks", "metrics": ["evidence_recall", "all_required_groups_present", "context_complete_flag"]}
+    ],
+    "formulas": {
+      "hit": "1 if at least one complete required evidence group is covered, otherwise 0",
+      "evidence_recall": "number of covered required evidence groups / number of required evidence groups",
+      "reciprocal_rank": "1 / rank of first chunk containing at least one validated supporting evidence span or table row, limited to first five; 0 if none. Partial group support can establish relevance but cannot establish complete group coverage.",
+      "macro_evidence_recall": "mean of per-question evidence_recall over the eight eligible questions",
+      "mrr_at_5": "mean reciprocal_rank over the eight eligible questions",
+      "all_required_groups_present": "1 if every required group is fully covered, otherwise 0"
+    },
+    "boundary_question_metrics": null,
+    "boundary_exclusion_reason": "q009、q010没有唯一必需答案证据集，不纳入Hit、MRR或召回率分母。",
+    "failure_handling": "Missing/failed stage is null, not zero or 100%; report completed/eligible counts. Retrieval completed but missed evidence is zero."
+  },
+  "answer": {
+    "rating_method": "Assistant/manual source-based review with answer excerpts and reasons; no automatic substring-only or embedding-similarity-only judgement, no judge-model API call in this phase.",
+    "point_status_values": {"correct": 1.0, "partial": 0.5, "missing": 0.0, "contradicted": 0.0},
+    "counted_point_weight": {"critical_true": 1, "critical_false": 0},
+    "supplementary_points": "critical=false is informative only, does not lower the score when omitted. All ten current questions have at least one critical point.",
+    "base_score": "100 * sum(weight * point_value) / sum(weight)",
+    "hard_error": "Any contradicted critical point or asserted forbidden claim sets final content_score to 0. Also applies to an unlisted factual contradiction that changes the answer, with a recorded source-based reason.",
+    "omission": "Missing/partial points reduce the base score; omission alone does not trigger the hard-error override.",
+    "forbidden_claim_matching": "Meaning and assertion polarity, never simple string matching. Explicitly rejecting a forbidden claim does not trigger a penalty.",
+    "equivalent_answers": "Accept correct paraphrases, equivalent numbers/units and logically equivalent expressions. Do not demand verbatim reference answers or redundant explanations.",
+    "content_pass": "All critical points correct, no hard error and no unsupported extra factual claim.",
+    "citations": {
+      "required_for_ids": ["q001", "q002", "q003", "q004", "q005", "q006", "q007", "q008"],
+      "point_citation_coverage": "number of critical points both correctly answered and supported by attached valid source citations / number of critical points",
+      "validity": "Every source label must exist in this run; source identity/page metadata must match the supplied evidence. Valid labels alone do not prove semantic support.",
+      "attachment": "A citation must attach to the relevant sentence, paragraph or explicitly linked answer item; a detached source list alone is insufficient.",
+      "grounded_pass": "content_pass AND point_citation_coverage == 1 AND no invalid citation label",
+      "no_citation_behavior": "For answerable questions point_citation_coverage=0, content score is graded independently. Boundary questions use null citation coverage and do not require invented citations."
+    },
+    "boundary_pass": {
+      "q009": "Both required points correct; acknowledges handbook insufficiency, does not invent opening times or claim nonexistent web verification.",
+      "q010": "Both required points correct; asks the scholarship type and explains missing eligibility information. Conditional examples are allowed if explicitly marked, never presented as a final eligibility conclusion."
+    },
+    "failure_handling": "No generated answer due to API failure is null, not a knowledge-score zero. Separately count completion and pipeline failures. A successfully generated inappropriate refusal on an answerable question is a scored answer."
+  },
+  "per_question_interpretation": {
+    "q001": "Only 6月、12月 are needed. 5月、11月 are anticipated-list submission months and are not the requested conferral months.",
+    "q002": "10日 is not 10个工作日; start is receipt of decision, not issuance. The 15-day review period is a different procedure.",
+    "q003": "8小时/周 and 40小时/月 are scored. The noncritical outside-class scheduling reminder is optional because the question already specifies the ordinary teaching period.",
+    "q004": "Eligibility rejection concerns the named undergraduate/junior-college national scholarship; do not extend it to all scholarships.",
+    "q005": "Exactly one third triggers the rule. Stating the applied threshold in an equivalent way is sufficient; no need to repeat the sentence '不要求超过'.",
+    "q006": "97分→4.5 and 五级制良→3.5 are the scored facts. Explicitly spelling out the 95～99 range is optional if 97分→4.5 is unambiguous.",
+    "q007": "Ordinary undergraduate row; 20册、30天、续借15天; once per book and within the due date. Partial p4 if once is correct but timing omitted, or vice versa; wrong timing is a contradiction.",
+    "q008": "All other basic conditions are supplied in the question. Score the exception, competition qualification, stamped proof, written recommendation and written/form application. Application eligibility does not guarantee an award.",
+    "q009": "Scope is the supplied handbook; it does not test actual 2026 holiday opening arrangements. Do not access the web for this baseline.",
+    "q010": "Do not default to national scholarship. A clear conditional discussion may accompany the clarification request."
+  },
+  "generation_isolation_control": {
+    "enabled_by_default": false,
+    "eligible_ids": ["q001", "q002", "q003", "q004", "q005", "q006", "q007", "q008"],
+    "name": "gold_evidence_control",
+    "method": "When needed, rerun the same question and generator with only the gold original evidence, keeping the answer prompt/model/parameters fixed. Never send reference answers or grading points to the answer generator.",
+    "purpose": "Separate retrieval/context omission from generation errors. Compare with end-to-end answer scoring; do not mix the two into one average."
+  },
+  "report": {
+    "separate_sections": ["retrieval_eight_questions", "answer_content_eight_questions", "answer_citations_eight_questions", "boundary_behavior_two_questions", "completion_and_cost"],
+    "single_composite_score": false,
+    "required_counts": ["retrieval_completed/8", "answer_completed/10", "content_pass/8", "grounded_pass/8", "boundary_pass/2", "pipeline_failed/10"],
+    "cost_fields": ["embedding_tokens", "rerank_tokens", "generation_input_tokens", "generation_output_tokens", "http_attempts", "stage_elapsed_seconds", "cache_hit"],
+    "interpretation": "A fixed ten-question local regression set, with no independent held-out set; report counts and individual cases, not broad generalization claims."
+  },
+  "references": [
+    {"title": "Sentence Transformers information retrieval evaluation", "url": "https://www.sbert.net/docs/package_reference/sentence_transformer/evaluation.html", "use": "Hit/Recall/MRR metric families; the evidence-group macro recall here is explicitly project-defined."},
+    {"title": "Ragas Faithfulness", "url": "https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/faithfulness/", "use": "Keep answer-to-evidence support separate from answer correctness; this rubric does not claim to compute the Ragas metric."}
+  ]
+}

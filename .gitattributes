@@ -2,3 +2,5 @@
 *.pdf binary
 *.jpg binary
 *.png binary
+# Frozen evaluation input is byte-hashed; preserve its original UTF-8 bytes.
+data/evaluation/sample-v1/questions.jsonl -text

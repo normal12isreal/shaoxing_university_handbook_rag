@@ -7,3 +7,4 @@ __pycache__/
 output/embeddings*/
 output/retrieval*/
 output/answers*/
+output/evaluation*/
