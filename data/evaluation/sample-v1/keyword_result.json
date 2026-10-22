@@ -1,0 +1,137 @@
+{
+  "recorded_at": "2026-10-22T12:44:17.363926+00:00",
+  "run_identity": "ea15ea6c539b6349bdcaeb83f460b990fc30dee66bf87c04e0dd5d7fc78ad053",
+  "retrieval_mode": "keyword_only",
+  "candidate_budget": {
+    "vector": 0,
+    "keyword": 1
+  },
+  "summary": {
+    "completed": 10,
+    "expected": 10,
+    "pipeline_failed": 0,
+    "reviewed_answers": 10,
+    "retrieval": {
+      "keyword_top1": {
+        "completed": 8,
+        "eligible": 8,
+        "macro_evidence_recall": 0.8958333333333334,
+        "hit_rate": 1,
+        "all_groups_present_count": 6,
+        "mrr_at_5": null
+      },
+      "rerank_top5": {
+        "completed": 8,
+        "eligible": 8,
+        "macro_evidence_recall": 0.8958333333333334,
+        "hit_rate": 1,
+        "all_groups_present_count": 6,
+        "mrr_at_5": 1.0
+      },
+      "answer_context": {
+        "completed": 8,
+        "eligible": 8,
+        "macro_evidence_recall": 0.9583333333333334,
+        "hit_rate": 1,
+        "all_groups_present_count": 7,
+        "mrr_at_5": null
+      }
+    },
+    "answerable_content_mean": 95.0,
+    "answerable_content_pass": 7,
+    "answerable_reviewed": 8,
+    "answerable_eligible": 8,
+    "citation_coverage_macro": 0.95,
+    "grounded_pass": 7,
+    "boundary_pass": 0,
+    "boundary_reviewed": 2,
+    "usage_reported_by_successful_calls": {
+      "embedding": {},
+      "rerank": {
+        "prompt_tokens": 3602,
+        "total_tokens": 3602
+      },
+      "generation": {
+        "prompt_tokens": 11901,
+        "completion_tokens": 2010,
+        "total_tokens": 13911
+      }
+    },
+    "http_attempts_in_saved_records": {
+      "embedding": 0,
+      "rerank": 10,
+      "generation": 10
+    },
+    "usage_note": "Failed or interrupted calls may be billed without returned usage. No document embeddings were regenerated."
+  },
+  "question_scores": [
+    {
+      "question_id": "q001",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q002",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q003",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q004",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q005",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q006",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q007",
+      "content_score": 100.0,
+      "grounded_pass": true,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q008",
+      "content_score": 60.0,
+      "grounded_pass": false,
+      "boundary_pass": null
+    },
+    {
+      "question_id": "q009",
+      "content_score": 75.0,
+      "grounded_pass": null,
+      "boundary_pass": false
+    },
+    {
+      "question_id": "q010",
+      "content_score": 25.0,
+      "grounded_pass": null,
+      "boundary_pass": false
+    }
+  ],
+  "report_path": "output\\evaluation-keyword-v1\\report.json",
+  "report_sha256": "71e8d4045f35da34314c36b9e3e3502e0b7f69c8c1b675bbd2855cad0d12ff09",
+  "comparison_path": "output\\evaluation-keyword-v1\\comparison.json",
+  "comparison_sha256": "78d1699d208c10251a70fcef5dae5899114773ec517a23707899fc0e5cea7e42",
+  "review_path": "data\\evaluation\\sample-v1\\keyword_answer_reviews.json",
+  "review_sha256": "7e8e49c675637fd9f2c0fcd18683d44d3a26b5e6be4858f2dff74577bf195140",
+  "scorer_sha256": "928745054e6345c2ff3d9429297ef61fb8c4abc18f179e3edf278a9ef0e93481",
+  "scope": "仅移除向量召回，关键词仍取1条；模型、提示词、评分不变；候选预算不同；单次固定10题对照，无独立盲评。"
+}

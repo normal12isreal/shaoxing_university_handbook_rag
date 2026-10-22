@@ -68,13 +68,16 @@ def retrieval_score(q, record, chunks, pages):
     stages = {}
     if record and record.get('retrieval'):
         r = record['retrieval']
-        for name, values in [('dense_top10', r['vector_candidates']),
-                             ('merged_candidates', r['rerank_candidates']), ('rerank_top5', r['hits'])]:
+        candidate_stages = ([('keyword_top1', r['keyword_candidates'])]
+                            if r.get('retrieval_mode') == 'keyword_only' else
+                            [('dense_top10', r['vector_candidates']), ('merged_candidates', r['rerank_candidates'])])
+        for name, values in candidate_stages + [('rerank_top5', r['hits'])]:
             stages[name] = stage_score(q, values, chunks, pages, ranked=name == 'rerank_top5')
     if record and record.get('answer_context'):
         stages['answer_context'] = stage_score(q, record['answer_context']['chunks'], chunks, pages)
         stages['answer_context']['context_complete_flag'] = record['answer_context']['complete']
-    return {'eligible': True, 'status': 'completed' if len(stages) == 4 else 'incomplete', 'stages': stages}
+    expected = 3 if record and (record.get('retrieval') or {}).get('retrieval_mode') == 'keyword_only' else 4
+    return {'eligible': True, 'status': 'completed' if len(stages) == expected else 'incomplete', 'stages': stages}
 
 
 def answer_score(q, record, review, chunks, pages):
@@ -149,11 +152,17 @@ def build_report(run, reviews_path=None):
     chunks = {c['chunk_id']: c for c in map(json.loads, (ROOT / 'output/linked-v1/chunks.jsonl').read_text(encoding='utf-8').splitlines())}
     run_manifest = json.loads((run / 'manifest.json').read_text(encoding='utf-8'))
     basis = run_manifest['basis']
+    mode = basis.get('retrieval_mode', 'hybrid')
+    if mode not in ('hybrid', 'keyword_only'):
+        raise ValueError('Unsupported experiment mode')
     if basis['questions_sha256'] != manifest['questions_sha256'] or basis['rules_sha256'] != sha256((DATASET / 'scoring_rules.json').read_bytes()):
         raise ValueError('Dataset or rules changed since the run')
     records = {p.stem: read_record(p) for p in (run / 'records').glob('q*.json')}
     if any(r['identity'] != run_manifest['identity'] for r in records.values()):
         raise ValueError('Record belongs to a different run')
+    if any((r.get('retrieval') or {}).get('retrieval_mode', 'hybrid') != mode
+           for r in records.values() if r.get('retrieval')):
+        raise ValueError('Saved retrieval mode differs from the run manifest')
     reviews = {}
     additions = []
     if reviews_path:
@@ -193,7 +202,8 @@ def build_report(run, reviews_path=None):
     reviewed = [r for r in eligible if r['answer']['status'] == 'reviewed']
     boundary = [r for r in rows if not r['retrieval']['eligible'] and r['answer']['status'] == 'reviewed']
     stage_summary = {}
-    for stage in ['dense_top10', 'merged_candidates', 'rerank_top5', 'answer_context']:
+    stage_names = (['keyword_top1'] if mode == 'keyword_only' else ['dense_top10', 'merged_candidates'])
+    for stage in stage_names + ['rerank_top5', 'answer_context']:
         available = [r['retrieval']['stages'][stage] for r in eligible if stage in r['retrieval']['stages']]
         stage_summary[stage] = {'completed': len(available), 'eligible': 8,
             'macro_evidence_recall': mean([a['evidence_recall'] for a in available]),
@@ -223,6 +233,7 @@ def build_report(run, reviews_path=None):
         'usage_reported_by_successful_calls': usage, 'http_attempts_in_saved_records': attempts,
         'usage_note': 'Failed or interrupted calls may be billed without returned usage. No document embeddings were regenerated.'}
     report = {'rules_id': rules['rules_id'], 'run_identity': run_manifest['identity'],
+              'retrieval_mode': mode,
               'scorer_sha256': sha256(Path(__file__).read_bytes()),
               'review_file_sha256': sha256(reviews_path.read_bytes()) if reviews_path else None,
               'annotation_supplements': additions,
@@ -239,10 +250,13 @@ def pct(value):
 
 def render_report(path, report):
     s = report['summary']
-    lines = ['学生手册固定10题：首轮基线评测报告', report['scope'],
+    mode_label = '纯关键词 Top-1 消融' if report['retrieval_mode'] == 'keyword_only' else '混合检索基线'
+    lines = ['学生手册固定10题：' + mode_label + '评测报告', report['scope'],
              f"执行完成：{s['completed']}/10；失败：{s['pipeline_failed']}/10；已评分：{s['reviewed_answers']}/10。", '', '一、检索（8道可回答题）']
     if report['annotation_supplements']:
-        lines.append('标注补充：q002第一名为手册附录《普通高等学校学生管理规定》第六十条，内容与原标注的校内规定一致；已核对并作为等价依据计分。原10题未修改，补充项保存在答案复核文件中。')
+        lines.append('共同标注补充：手册附录《普通高等学校学生管理规定》第六十条与q002原标注的校内规定等价，沿用基线复核结果作为有效依据。本轮是否召回见逐题记录；原10题未修改。')
+    if report['retrieval_mode'] == 'keyword_only':
+        lines.append('向量召回已关闭；关键词只取1条，重排上限仍为5但实际只有1个候选；保留原有关联补读。')
     for stage, score in s['retrieval'].items():
         lines.append(f"{stage}：完成{score['completed']}/8，证据组宏平均召回率{pct(score['macro_evidence_recall'])}，全部依据齐全{score['all_groups_present_count']}/8" +
                      (f"，MRR@5={score['mrr_at_5']:.4f}" if score['mrr_at_5'] is not None else ''))

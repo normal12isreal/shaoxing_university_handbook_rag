@@ -15,7 +15,9 @@ if __package__:
     from .embedding_api import ApiFailure, EmbeddingClient
     from .embedding_store import output_lock, sha256, write_json
     from .generation_api import GenerationClient, load_generation_config
+    from .keyword_retrieval import keyword_top_one
     from .rerank_api import RerankClient, load_rerank_config
+    from .rerank_chunks import rerank_hits
     from .retrieve_chunks import load_corpus, run_query
 else:
     from answer_question import build_messages, citation_audit
@@ -24,7 +26,9 @@ else:
     from embedding_api import ApiFailure, EmbeddingClient
     from embedding_store import output_lock, sha256, write_json
     from generation_api import GenerationClient, load_generation_config
+    from keyword_retrieval import keyword_top_one
     from rerank_api import RerankClient, load_rerank_config
+    from rerank_chunks import rerank_hits
     from retrieve_chunks import load_corpus, run_query
 
 DATASET = ROOT / 'data/evaluation/sample-v1'
@@ -66,7 +70,25 @@ def load_dataset():
     return questions, manifest, rules
 
 
-def execute(output, limit):
+def keyword_only_query(question, chunks, identity, rerank, client):
+    """Ablation: keep the existing single BM25 hit; never encode a query vector."""
+    candidate = keyword_top_one(question, chunks)
+    candidates = [{**candidate, 'rank': 1}] if candidate else []
+    hits, metadata = (rerank_hits(question, candidates, {c['chunk_id']: c for c in chunks},
+        identity, rerank, client, ROOT / '.runtime/reranking-v1') if candidates else
+        ([], {'usage_this_run': {}, 'http_attempts': 0, 'candidate_count': 0}))
+    return {'question': question, 'retrieval_mode': 'keyword_only',
+            'algorithm': 'bm25_cjk_bigram_then_rerank', 'corpus_identity': identity,
+            'corpus_chunks': len(chunks), 'top_k': 1, 'vector_candidates': [],
+            'query_embedding': {'status': 'disabled', 'usage_this_run': {}, 'http_attempts': 0},
+            'keyword_candidates': candidates, 'rerank_candidates': candidates,
+            'hits': hits, 'reranking': metadata, 'reranker_used': bool(candidates),
+            'final_top_n': len(hits), 'answer_model_used': False}
+
+
+def execute(output, limit, retrieval_mode='hybrid'):
+    if retrieval_mode not in ('hybrid', 'keyword_only'):
+        raise ValueError('Unsupported retrieval mode')
     questions, manifest, rules = load_dataset()
     config = {**load_config(ROOT), 'max_requests_per_run': 3}
     rerank = {**load_rerank_config(ROOT), 'max_requests_per_run': 3}
@@ -89,6 +111,8 @@ def execute(output, limit):
              'embedding': config, 'rerank': rerank, 'generation': generation,
              'expansion': limits, 'system_prompt_sha256': sha256(prompt.encode('utf-8')),
              'source_hashes': {n: sha256((ROOT / 'scripts' / n).read_bytes()) for n in source_names},
+             'retrieval_mode': retrieval_mode,
+             'candidate_budget': {'vector': 10 if retrieval_mode == 'hybrid' else 0, 'keyword': 1},
              'crag_enabled': False, 'web_enabled': False}
     run_identity = digest(basis)
     manifest_path = output / 'manifest.json'
@@ -122,26 +146,35 @@ def execute(output, limit):
             if record['retrieval'] is None:
                 start = perf_counter()
                 try:
-                    record['retrieval'] = run_query(question, chunks, normalized, identity, config,
-                        embed_client, ROOT / '.runtime/query-embeddings-v1', top_k=10,
-                        rerank_config=rerank, rerank_client=rerank_client,
-                        rerank_cache_dir=ROOT / '.runtime/reranking-v1')
+                    if retrieval_mode == 'keyword_only':
+                        record['retrieval'] = keyword_only_query(question, chunks, identity, rerank, rerank_client)
+                    else:
+                        record['retrieval'] = run_query(question, chunks, normalized, identity, config,
+                            embed_client, ROOT / '.runtime/query-embeddings-v1', top_k=10,
+                            rerank_config=rerank, rerank_client=rerank_client,
+                            rerank_cache_dir=ROOT / '.runtime/reranking-v1')
                 finally:
                     record['timing_seconds']['retrieval'] = perf_counter() - start
                 save_record(path, record)
             phase = 'context'
             start = perf_counter()
-            record['answer_context'] = expand_context(
-                [h['chunk_id'] for h in record['retrieval']['hits']], by_id, limits)
+            seed_ids = [h['chunk_id'] for h in record['retrieval']['hits']]
+            record['answer_context'] = (expand_context(seed_ids, by_id, limits) if seed_ids else
+                {'chunks': [], 'seed_chunk_ids': [], 'added_chunk_ids': [], 'omitted_chunk_ids': [],
+                 'relations_not_examined': 0, 'complete': True, 'total_chars': 0,
+                 'limits': limits, 'expansion_hops': 1})
             record['timing_seconds']['context'] = perf_counter() - start
-            messages, sources = build_messages(question, record['answer_context'], prompt)
+            messages, sources = (build_messages(question, record['answer_context'], prompt)
+                                 if record['answer_context']['chunks'] else ([], []))
             record.update(messages=messages, sources=sources, status='prepared')
             save_record(path, record)
             phase = 'generation'
             print(f'{qid}: generating', flush=True)
             start = perf_counter()
             try:
-                record['generation'] = answer_client.generate(messages)
+                record['generation'] = (answer_client.generate(messages) if messages else
+                    {'answer': '现有资料没有提供足够依据，暂时无法确定这个问题的答案。',
+                     'complete': True, 'usage': {}, 'response_model': None, 'finish_reason': 'no_evidence'})
             finally:
                 record['timing_seconds']['generation'] = perf_counter() - start
             record['citation_audit'] = citation_audit(record['generation']['answer'], len(sources))
@@ -173,9 +206,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / 'output/evaluation-v1')
     parser.add_argument('--limit', type=int, choices=range(1, 11), default=10)
+    parser.add_argument('--retrieval-mode', choices=['hybrid', 'keyword_only'], default='hybrid')
     args = parser.parse_args()
     with output_lock(args.output):
-        execute(args.output, args.limit)
+        execute(args.output, args.limit, args.retrieval_mode)
 
 
 if __name__ == '__main__':

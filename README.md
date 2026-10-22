@@ -318,3 +318,18 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 2026-10-22首轮：10/10完成，无请求失败；8题在向量、合并、重排和最终上下文阶段的证据组宏平均召回率均为100%，MRR@5为1。8题回答内容均100分，引用覆盖均通过；q009为75分，拒答正确但未指出查对应假期通知；q010为25分，列出条件却未先追问奖种，并存在对年级资格的过度概括。边界行为完整通过0/2，不能描述为两题全部内容错误。
 
 q002还命中了原标注之外、内容等价的手册附录条款，复核后记为有效依据，补充过程保存在 `baseline_answer_reviews.json`。内容评分由助手依据冻结规则复核，并非独立人工盲评或Ragas自动评分。这10题的结果不能外推为整体正确率。
+
+### 对照实验：只保留关键词Top-1
+
+```powershell
+# 关闭向量召回；保留原BM25第一名、重排、关联补读和同一生成配置
+.\.venv\Scripts\python.exe .\scripts\evaluate_questions.py --retrieval-mode keyword_only --output output/evaluation-keyword-v1
+.\.venv\Scripts\python.exe .\scripts\score_evaluation.py --run output/evaluation-keyword-v1 --reviews data/evaluation/sample-v1/keyword_answer_reviews.json
+.\.venv\Scripts\python.exe .\scripts\compare_evaluations.py
+```
+
+2026-10-22实测10/10完成：8题内容平均分100→95，内容和引用完整通过8/8→7/8；重排后证据组召回100%→89.58%，补读后100%→95.83%。q008只找到了资格条款，漏掉申请程序，两项要点缺失，100→60；q007的续借正文通过既有关联补读补齐，仍100。两道边界题仍为75、25。MRR@5均为1，说明首条相关不等于依据完整。
+
+对照报告：`output/evaluation-keyword-v1/comparison.txt`（另有JSON）；详细答案和扣分记录：同目录`report.txt`；固定复核记录：`data/evaluation/sample-v1/keyword_answer_reviews.json`。原题目、评分规则、手册和索引均未修改。关键词组没有查询向量API调用，实际10次重排、10次生成；单候选重排不能找回缺失资料。
+
+候选由最多11条减少到1条，因此这是移除向量路线的消融，不是相同Top-K预算的算法比较；未更换或刻意降低生成模型。每组只生成一次，未估计生成波动。重新生成须使用新输出目录，并针对新回答重新复核，旧复核文件不能套用。增加实验模式后程序哈希变化，原基线目录保留历史结果；要重新跑混合组须另选目录，例如`--output output/evaluation-hybrid-v2`。

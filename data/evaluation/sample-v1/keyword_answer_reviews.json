@@ -1,0 +1,499 @@
+{
+  "schema_version": 1,
+  "run_identity": "ea15ea6c539b6349bdcaeb83f460b990fc30dee66bf87c04e0dd5d7fc78ad053",
+  "method": "助手逐项复核实际回答与实际上下文；沿用冻结规则及相同等价依据补充；参考答案和评分要点未发送给模型。",
+  "evidence_additions": [
+    {
+      "question_id": "q002",
+      "group_id": "g1",
+      "reason": "第一名资料为手册附录的教育部规定第六十条，与校内申诉规定第七条完整同义；复核后作为等价依据，避免因标注遗漏低估第一名相关性。",
+      "evidence": {
+        "evidence_id": "q002-e-reviewed-alt1",
+        "document_id": "student-handbook-2025",
+        "section_path": [
+          "普通高等学校学生管理规定",
+          "第六章 学生申诉"
+        ],
+        "article": "第六十条",
+        "pdf_pages": [
+          216
+        ],
+        "quote": "第六十条 学生对学校的处理或者处分决定有异议的，可以在接到学校处理或者处分决定书之日起 10 日内，向学校学生申诉处理委员会提出书面申诉。",
+        "quote_format": "verbatim_text",
+        "locator": {
+          "kind": "text_spans",
+          "spans": [
+            {
+              "pdf_page": 216,
+              "block_index": 5,
+              "char_start": 0,
+              "char_end": 69
+            }
+          ]
+        },
+        "chunk_ids": [
+          "chunk-0242"
+        ]
+      }
+    }
+  ],
+  "answers": [
+    {
+      "question_id": "q001",
+      "answer_sha256": "1f694f4ff97037e5a40f0ab9b5b2be18119d59b5bb670f86a1ec876e5fcff97d",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "根据2025版《绍兴文理学院学士学位授予工作细则》，学校每年在 **6月** 和 **12月** 办理学士学位授予。",
+          "reason": "明确6月。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第八条规定，“学位授予每年 6 月、12 月各办理一次。” [资料1]"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "根据2025版《绍兴文理学院学士学位授予工作细则》，学校每年在 **6月** 和 **12月** 办理学士学位授予。",
+          "reason": "明确12月。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第八条规定，“学位授予每年 6 月、12 月各办理一次。” [资料1]"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q002",
+      "answer_sha256": "682192f48402724f7b0bf2056b4be64abc0f03d9851962061190935a6e8763f2",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "*   **起算时间与期限**：在**接到学校处理或者处分决定书之日起 10 日内**提出 [资料1]。",
+          "reason": "接到决定书之日起算。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> “学生对学校的处理或者处分决定有异议的，可以在接到学校处理或者处分决定书之日起 10 日内，向学校学生申诉处理委员会提出书面申诉。” [资料1]"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "*   **起算时间与期限**：在**接到学校处理或者处分决定书之日起 10 日内**提出 [资料1]。",
+          "reason": "明确10日内。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> “学生对学校的处理或者处分决定有异议的，可以在接到学校处理或者处分决定书之日起 10 日内，向学校学生申诉处理委员会提出书面申诉。” [资料1]"
+        },
+        {
+          "point_id": "p3",
+          "judgment": "correct",
+          "answer_excerpt": "> “学生对学校的处理或者处分决定有异议的，可以在接到学校处理或者处分决定书之日起 10 日内，向学校学生申诉处理委员会提出书面申诉。” [资料1]",
+          "reason": "受理机构和书面形式齐全。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> “学生对学校的处理或者处分决定有异议的，可以在接到学校处理或者处分决定书之日起 10 日内，向学校学生申诉处理委员会提出书面申诉。” [资料1]"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q003",
+      "answer_sha256": "7fb383df0b240283aff589b8ac421144846a65c9df87817d58d95d12ebc68d5f",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "*   **每周**：不超过 8 小时。",
+          "reason": "每周8小时。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第二十二条规定，“为了保证学习的时间，学生参加勤工助学的工作时间应安排在业余时间（节假日除外），每周不超过 8 小时，每月不得多于 40 小时。” [资料1]"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "*   **每月**：不得多于 40 小时。",
+          "reason": "每月40小时。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第二十二条规定，“为了保证学习的时间，学生参加勤工助学的工作时间应安排在业余时间（节假日除外），每周不超过 8 小时，每月不得多于 40 小时。” [资料1]"
+        },
+        {
+          "point_id": "p3",
+          "judgment": "correct",
+          "answer_excerpt": "*   **具体条款**：第二十二条规定，“为了保证学习的时间，学生参加勤工助学的工作时间应安排在业余时间（节假日除外），每周不超过 8 小时，每月不得多于 40 小时。” [资料1]",
+          "reason": "明确业余时间。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第二十二条规定，“为了保证学习的时间，学生参加勤工助学的工作时间应安排在业余时间（节假日除外），每周不超过 8 小时，每月不得多于 40 小时。” [资料1]"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q004",
+      "answer_sha256": "383545a0dcff32bafa3259c63456c9e5d93a8ec98b1ab48cf3b3a3c1500128ee",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "不能申请。",
+          "reason": "明确不符合该项申请资格。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第七条明确规定申请条件包括“具有中华人民共和国国籍” [资料1]。"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "根据《绍兴文理学院本（专）科学生国家奖学金评审办法》，申请国家奖学金必须**具有中华人民共和国国籍**。由于您不具有中华人民共和国国籍，不符合该项基本申请条件。",
+          "reason": "明确中国国籍要求。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体条款**：第七条明确规定申请条件包括“具有中华人民共和国国籍” [资料1]。"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q005",
+      "answer_sha256": "1779ab6b2c85f672f118a9d718012ed64c1fc0559aef33e8a7136578a244b428",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "规定明确指出，“一学期缺交作业（实验报告）达三分之一及以上”属于取消期末考试资格的情形之一。一旦取消资格，“该课程成绩记为‘0’分”。",
+          "reason": "达到三分之一即触发。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> 依据：《绍兴文理学院全日制本专科学生学籍管理规定》第十八条：“有下列情况之一者，取消其该课程期末考试资格，该课程成绩记为‘0’分……（二）一学期缺交作业（实验报告）达三分之一及以上；” [资料1]"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "根据《绍兴文理学院全日制本专科学生学籍管理规定》，你**不能**参加这门课的期末考试和补考，该课程成绩将记为“0”分。",
+          "reason": "取消期末考试资格。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> 依据：《绍兴文理学院全日制本专科学生学籍管理规定》第十八条：“有下列情况之一者，取消其该课程期末考试资格，该课程成绩记为‘0’分……（二）一学期缺交作业（实验报告）达三分之一及以上；” [资料1]"
+        },
+        {
+          "point_id": "p3",
+          "judgment": "correct",
+          "answer_excerpt": "根据《绍兴文理学院全日制本专科学生学籍管理规定》，你**不能**参加这门课的期末考试和补考，该课程成绩将记为“0”分。",
+          "reason": "课程成绩0分。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> 依据：《绍兴文理学院全日制本专科学生学籍管理规定》第十八条：“有下列情况之一者，取消其该课程期末考试资格，该课程成绩记为‘0’分……（二）一学期缺交作业（实验报告）达三分之一及以上；” [资料1]"
+        },
+        {
+          "point_id": "p4",
+          "judgment": "correct",
+          "answer_excerpt": "被取消期末考试资格的学生，同时也“取消补考资格”。",
+          "reason": "取消补考资格。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "> 依据：《绍兴文理学院全日制本专科学生学籍管理规定》第十八条：“……并取消补考资格” [资料1]；第二十条：“有下列情况之一，不得补考:……（二）取消考试资格；” [资料1]"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q006",
+      "answer_sha256": "b77e14c5c808924e1c5e7596c73e162b24128d2c8829a394e170e8ed6cf5afc8",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "1.  **百分制97分**：对应的课程绩点为 **4.5**。",
+          "reason": "97为4.5，后文明示区间。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   依据：计分方式为百分制时，成绩在95～99分区间的绩点为4.5 [资料1]。"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "2.  **五级制“良”**：对应的课程绩点为 **3.5**。",
+          "reason": "良为3.5。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   依据：计分方式为五级制时，等级为“良”的绩点为3.5 [资料1]。"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q007",
+      "answer_sha256": "49fef68f72f31a941894a3acf3eacf75ee51cdbbb99251cb04451b105c0ef64b",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "*   **最多借书册数**：20册 [资料1]。",
+          "reason": "20册。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **最多借书册数**：20册 [资料1]。"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "*   **借期**：30天 [资料1]。",
+          "reason": "30天。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **借期**：30天 [资料1]。"
+        },
+        {
+          "point_id": "p3",
+          "judgment": "correct",
+          "answer_excerpt": "*   **续借次数与天数**：每册图书可办理延期续借**一次**，续借期为**15天** [资料1][资料3]。",
+          "reason": "续借15天。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **续借次数与天数**：每册图书可办理延期续借**一次**，续借期为**15天** [资料1][资料3]。"
+        },
+        {
+          "point_id": "p4",
+          "judgment": "correct",
+          "answer_excerpt": "*   **办理时间与途径**：需在**应归还的日期内**办理；可通过服务台、图书馆网站、超星移动图书馆、图书馆微信公众号等途径办理 [资料3]。",
+          "reason": "上一行明确一次，本行明确应归还日期内办理，均引用资料3。",
+          "cited_source_labels": [
+            "资料3"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **续借次数与天数**：每册图书可办理延期续借**一次**，续借期为**15天** [资料1][资料3]。"
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "逐项对照实际上下文正确；已核对禁止结论，额外解释也有依据。"
+    },
+    {
+      "question_id": "q008",
+      "answer_sha256": "0ca83acf75d097e4f0ae650519f6961d49a5c76bfb91460c698e7d11f010a7b3",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "*   **依据：** 根据《绍兴文理学院本（专）科学生国家奖学金评审办法》第十一条规定：“学习成绩排名和综合考评成绩排名没有进入前 10%，但达到前 30%（含 30%）的学生，如在道德风尚、学术研究、学科竞赛……等某一方面表现特别优秀，也可申请本（专）科生国家奖学金” [资料1]。",
+          "reason": "前30%例外，结合前20%明确可申请。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **依据：** 根据《绍兴文理学院本（专）科学生国家奖学金评审办法》第十一条规定：“学习成绩排名和综合考评成绩排名没有进入前 10%，但达到前 30%（含 30%）的学生，如在道德风尚、学术研究、学科竞赛……等某一方面表现特别优秀，也可申请本（专）科生国家奖学金” [资料1]。"
+        },
+        {
+          "point_id": "p2",
+          "judgment": "correct",
+          "answer_excerpt": "*   **具体匹配条款：** 该办法明确界定“在学科竞赛方面取得显著成绩”包括：“在国际和全国性专业学科竞赛……等竞赛中获一等奖（或金奖）及以上奖励” [资料1]。",
+          "reason": "全国性专业学科竞赛一等奖匹配条款。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **具体匹配条款：** 该办法明确界定“在学科竞赛方面取得显著成绩”包括：“在国际和全国性专业学科竞赛……等竞赛中获一等奖（或金奖）及以上奖励” [资料1]。"
+        },
+        {
+          "point_id": "p3",
+          "judgment": "correct",
+          "answer_excerpt": "您需要提交**详细的证明材料**，且该材料必须经过**学校审核盖章确认**。",
+          "reason": "详细证明与学校审核盖章齐全。",
+          "cited_source_labels": [
+            "资料1"
+          ],
+          "citation_support": true,
+          "citation_excerpt": "*   **依据：** 《绍兴文理学院本（专）科学生国家奖学金评审办法》第十一条规定：“但需提交详细的证明材料，证明材料须经学校审核盖章确认” [资料1]。"
+        },
+        {
+          "point_id": "p4",
+          "judgment": "missing",
+          "answer_excerpt": null,
+          "reason": "未召回申请流程，未说明辅导员或班主任书面推荐。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        },
+        {
+          "point_id": "p5",
+          "judgment": "missing",
+          "answer_excerpt": null,
+          "reason": "未说明向学院书面申请及填写审批表。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "资格与证明三项正确；chunk-0158流程未召回，模型明确资料不足，两项按遗漏扣分，未捏造。"
+    },
+    {
+      "question_id": "q009",
+      "answer_sha256": "fa134b6236661fbcf4f2138fb283ec8e585aaafebc3394f5e7f3dab4ba126431",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "correct",
+          "answer_excerpt": "根据提供的检索资料，无法回答2026年国庆假期学校图书馆每天具体的开门和闭馆时间。",
+          "reason": "明确特定假期资料不足。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        },
+        {
+          "point_id": "p2",
+          "judgment": "partial",
+          "answer_excerpt": "上述资料均未包含图书馆的开馆时间、闭馆时间或节假日开放安排。因此，具体开放时间无法从现有资料中确定。",
+          "reason": "未编造钟点，但未指出查对应假期开放通知。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "与基线同规则：正确拒答，但缺少通知查证指引，75分。"
+    },
+    {
+      "question_id": "q010",
+      "answer_sha256": "64da26d8a864d57e4a892bed256d7a154e393299b54fa89f9197273e7b7ee6c9",
+      "reviewer": "assistant_source_review",
+      "points": [
+        {
+          "point_id": "p1",
+          "judgment": "missing",
+          "answer_excerpt": null,
+          "reason": "没有先询问奖学金种类。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        },
+        {
+          "point_id": "p2",
+          "judgment": "partial",
+          "answer_excerpt": "根据提供的资料，**大二学生如果满足特定的创新创业竞赛获奖条件，可以获得国家奖学金或校卓越奖学金的推荐资格**。",
+          "reason": "描述特定条件和检索资料限制，但未明确请用户补充奖项与个人条件。",
+          "cited_source_labels": [],
+          "citation_support": false,
+          "citation_excerpt": ""
+        }
+      ],
+      "forbidden_claim_asserted": [
+        false,
+        false,
+        false
+      ],
+      "extra_unsupported_claims": [],
+      "extra_critical_contradictions": [],
+      "reason": "未只凭大二保证资格，也未把奖学金直接限定为国家奖学金；但没有完成澄清，25分。"
+    }
+  ]
+}

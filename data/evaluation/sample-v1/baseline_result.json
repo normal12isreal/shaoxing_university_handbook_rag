@@ -132,7 +132,7 @@
       "boundary_pass": false
     }
   ],
-  "report_path": "output/evaluation-v1/report.txt",
+  "report_path": "output/evaluation-v1/report.json",
   "report_sha256": "ca3b2042ecaeca47a6ea7af6f8743793ef0438e86d18e66f46896dfcb39367ac",
   "review_file_sha256": "9cfb2bdc95516e397f60a70de0914f38da2ca0cbd18c23696b973a0e9d56d2ca",
   "scorer_sha256": "279473c9e6547d4a422fe8e744b59b6393df7e6b5424e2d369185a336ba105e5",
