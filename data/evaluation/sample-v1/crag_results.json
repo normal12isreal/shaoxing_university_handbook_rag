@@ -1,0 +1,132 @@
+{
+  "scope": "固定10题、20份既有上下文的独立判断与推荐路由；实际链路只验证3个关键案例，未重跑完整10题生成评分。",
+  "limitations": [
+    "标注由助手建立，非独立盲评。",
+    "新版提示词在同组题上调整，属于开发验证。",
+    "草稿复核使用同一模型家族，可能重复原错误；修改后未做第二轮语义复核。",
+    "本次没有实际执行联网搜索；官方网页获取与质量仍需另行验证。"
+  ],
+  "runs": {
+    "legacy": {
+      "path": "output/evaluation-crag-legacy-v1/report.json",
+      "sha256": "af1fee4addae2bbca11e54ccaa993173a902d740d03389d60d22abc4c0b169fb",
+      "identity": "79a960443130e19f866585efe81c29b82bc10e4a0f40da27f51961865fb265fa",
+      "summary": {
+        "expected_cases": 20,
+        "completed": 20,
+        "decision_eligible": 18,
+        "decision_correct": 18,
+        "action_correct": 17,
+        "insufficient_case_count": 3,
+        "false_release_count": 0,
+        "sufficient_case_count": 15,
+        "overblocking_count": 0,
+        "clarification_correct": 0,
+        "http_attempts": 20,
+        "usage": {
+          "prompt_tokens": 30308,
+          "completion_tokens": 1947,
+          "total_tokens": 32255
+        }
+      }
+    },
+    "adaptive_initial": {
+      "path": "output/evaluation-crag-adaptive-v1/report.json",
+      "sha256": "8c1ab12de0668841d2276b0bcb48c32d4d02671b47242e7ac7f7365add7f9a80",
+      "identity": "515ac80a477e06f9ef2d032a4f462ed1fe8f666f1f06b2b0fe0cc67617ac9f19",
+      "summary": {
+        "expected_cases": 20,
+        "completed": 19,
+        "decision_eligible": 18,
+        "decision_correct": 15,
+        "action_correct": 17,
+        "insufficient_case_count": 3,
+        "false_release_count": 0,
+        "sufficient_case_count": 15,
+        "overblocking_count": 2,
+        "clarification_correct": 2,
+        "http_attempts": 20,
+        "usage": {
+          "prompt_tokens": 36888,
+          "completion_tokens": 3890,
+          "total_tokens": 40778
+        }
+      }
+    },
+    "adaptive_revised": {
+      "path": "output/evaluation-crag-adaptive-v2/report.json",
+      "sha256": "4907a6c50259824a9a458b70ff11a9b2ea27315e99f09aafb373b504d83f3609",
+      "identity": "0d92344cc6ce9c9f4c77caaa2bafc1bd0fcbb68ad7b3c20c8a442889b90e9a92",
+      "summary": {
+        "expected_cases": 20,
+        "completed": 20,
+        "decision_eligible": 18,
+        "decision_correct": 18,
+        "action_correct": 20,
+        "insufficient_case_count": 3,
+        "false_release_count": 0,
+        "sufficient_case_count": 15,
+        "overblocking_count": 0,
+        "clarification_correct": 2,
+        "http_attempts": 20,
+        "usage": {
+          "prompt_tokens": 39908,
+          "completion_tokens": 3029,
+          "total_tokens": 42937
+        }
+      }
+    }
+  },
+  "examples": {
+    "local_retry": {
+      "initial_group_recall": 0.6666666666666666,
+      "final_group_recall": 1.0,
+      "query": "绍兴文理学院国家奖学金申请材料清单 提交流程",
+      "route": "local",
+      "web_http_attempts": 0,
+      "reflection_status": "passed"
+    },
+    "reflection": {
+      "synthetic_wrong_draft": true,
+      "before": "根据勤工助学规定，每周最多40小时，每月最多8小时。[资料1]",
+      "after": "根据《绍兴文理学院学生勤工助学管理办法（修订）》，平时上课期间（业余时间）参加校内勤工助学的时长限制如下：\n\n*   **每周**：不超过 8 小时\n*   **每月**：不得多于 40 小时\n\n**依据：**\n*   **制度名称**：《绍兴文理学院学生勤工助学管理办法（修订）》\n*   **具体条款**：第四章 岗位管理、考核及报酬发放 第二十二条\n*   **关键原文**：“为了保证学习的时间，学生参加勤工助学的工作时间应安排在业余时间（节假日除外），每周不超过 8 小时，每月不得多于 40 小时。” [资料1]",
+      "verdict": {
+        "verdict": "revise",
+        "issues": [
+          {
+            "kind": "unsupported",
+            "answer_excerpt": "每周最多40小时，每月最多8小时。",
+            "explanation": "草稿中的数字与原文严重不符且颠倒。根据资料1第二十二条，规定为“每周不超过 8 小时，每月不得多于 40 小时”，而非草稿所述的每周40小时、每月8小时。"
+          }
+        ]
+      },
+      "status": "revised_not_rechecked"
+    },
+    "clarification": {
+      "question": "我现在大二，能申请奖学金吗？",
+      "answer": "请问您具体想咨询哪种奖学金？（例如：国家奖学金、省政府奖学金、国家励志奖学金或校级奖学金？）",
+      "route": "ask_user",
+      "generation_http_attempts": 0,
+      "web_http_attempts": 0
+    }
+  },
+  "example_records": {
+    "local_retry": {
+      "path": "output/evaluation-adaptive-examples-v1/local_retry.json",
+      "sha256": "c2d07d854103beb5a06d105792c449c8eb3af7e57b57dc4b052b23e290472056"
+    },
+    "reflection": {
+      "path": "output/evaluation-adaptive-examples-v1/reflection.json",
+      "sha256": "ab5e0314e804e67fee1d72202e62a4a3cc5fc6289ae874f05bf8be9ca786eee6"
+    },
+    "clarification": {
+      "path": "output/evaluation-adaptive-examples-v1/clarification.json",
+      "sha256": "ba4cdba1c7f9f4c8fefb908cbd5b5638f8e24185c98978eb3ba073a942672ee9"
+    }
+  },
+  "summary_report_path": "output/evaluation-crag-summary-v1/report.json",
+  "summary_report_sha256": "d31fded72455ad4060a3d6f275856e8747807ac232e955a966eb7efb272d6bb8",
+  "questions_sha256": "ca4d1e5c7be20e98ee4b2c98380a6e007075ad4e4b7dd1cfeb72fa35e21f6d06",
+  "case_labels_sha256": "19b6f81ae6c60355f84124ef8e8e331d0cb03e0b3d85dc2bc7170ed56e1f2f82",
+  "current_prompt_sha256": "920b2847af31e63b216ef877ab7011c2c083f1f36e4372695e87b3f8f740c2ed"
+}

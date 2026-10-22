@@ -20,7 +20,7 @@ def load_crag_config(root: Path):
     return config
 
 
-def parse_assessment(result, chunk_ids):
+def parse_assessment(result, chunk_ids, *, require_search_query=True):
     if not result['complete']:
         raise ValueError('Incomplete evidence assessment')
     assessment = json.loads(result['answer'])
@@ -33,7 +33,7 @@ def parse_assessment(result, chunk_ids):
     if not isinstance(assessment.get('reason'), str) or not 1 <= len(assessment['reason']) <= 500:
         raise ValueError('Invalid assessment reason')
     query = assessment.get('search_query')
-    if not isinstance(query, str) or len(query) > 200 or (assessment['decision'] != 'sufficient' and not query.strip()):
+    if not isinstance(query, str) or len(query) > 200 or (require_search_query and assessment['decision'] != 'sufficient' and not query.strip()):
         raise ValueError('Invalid assessment query')
     return {k: assessment[k] for k in ('decision', 'reason', 'support_ids', 'search_query')}
 

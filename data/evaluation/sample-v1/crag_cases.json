@@ -1,0 +1,206 @@
+{
+  "questions_sha256": "ca4d1e5c7be20e98ee4b2c98380a6e007075ad4e4b7dd1cfeb72fa35e21f6d06",
+  "method": "在新评估调用前，根据冻结问题与实际已核对的证据组建立标签。仅用于离线评分，不传给模型。",
+  "cases": [
+    {
+      "case_id": "hybrid-q001",
+      "question_id": "q001",
+      "question": "按照2025版学生手册，学校每年在哪几个月办理学士学位授予？",
+      "record_path": "output/evaluation-v1/records/q001.json",
+      "record_sha256": "f1fb1efb093194ec0ed68ba01ecfaa74af090f00fe992a59eb9cba5581218eab",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q002",
+      "question_id": "q002",
+      "question": "学生对学校的处理或者处分决定有异议，应从什么时候起、在多少日内向哪个机构提出什么形式的申诉？",
+      "record_path": "output/evaluation-v1/records/q002.json",
+      "record_sha256": "ba216cdec3963ac756bafb70860d3ab98b26ac6a3011cba52780cdd034bd25d1",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q003",
+      "question_id": "q003",
+      "question": "平时上课期间，我在学校做勤工助学，一周最多能干几个小时？一个月呢？",
+      "record_path": "output/evaluation-v1/records/q003.json",
+      "record_sha256": "afed4c53119926a9cbb65f57a9168ba8f3106d590e4c409757f80c3211f21910",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q004",
+      "question_id": "q004",
+      "question": "我是在校本科生，但不具有中华人民共和国国籍，能申请手册里的本专科生国家奖学金吗？",
+      "record_path": "output/evaluation-v1/records/q004.json",
+      "record_sha256": "0425c2fcbd61bca0922d6172a1cea7a85ce5726c4f176c200c7524063a67a397",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q005",
+      "question_id": "q005",
+      "question": "这学期我有一门课正好三分之一的作业没交，其他情况正常，还能参加这门课的期末考试和补考吗？成绩怎么记？",
+      "record_path": "output/evaluation-v1/records/q005.json",
+      "record_sha256": "35a9aec4e5d8783b31f9e7e4688492c015afad74fe6703132ee93cc19fdea175",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q006",
+      "question_id": "q006",
+      "question": "百分制97分和五级制“良”，对应的课程绩点分别是多少？",
+      "record_path": "output/evaluation-v1/records/q006.json",
+      "record_sha256": "5687e3ce4363a36629aa2549a3eb1821bb38d1376eb76902936f44cfee2f9321",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q007",
+      "question_id": "q007",
+      "question": "我是本校普通本科生，不属于留学生读者类别。图书馆最多能借几本书，借期多少天？每册能续借几天、几次，什么时候办理？",
+      "record_path": "output/evaluation-v1/records/q007.json",
+      "record_sha256": "4547b1f6ab451bada221af10007ac40d200486eaf2e98691cf13e5525c77689d",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q008",
+      "question_id": "q008",
+      "question": "我是中国国籍的大二本科生，本学年学习成绩和综合考评排名都在班级前20%，没有不及格科目，获得全国性专业学科竞赛一等奖，其他基本条件均满足。按手册能否申请国家奖学金？需要什么证明，个人申请怎么提交？",
+      "record_path": "output/evaluation-v1/records/q008.json",
+      "record_sha256": "c748805be174c77aaf167ad33dcf22fbc417dd85fb2060b587a8df906cb12812",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "hybrid-q009",
+      "question_id": "q009",
+      "question": "2026年国庆假期，学校图书馆每天具体几点开门、几点闭馆？",
+      "record_path": "output/evaluation-v1/records/q009.json",
+      "record_sha256": "520c3634e0acc09ef2c98653bae8476319bdd15bcc512d94234f694e04aecceb",
+      "expected_decision": "insufficient",
+      "expected_action": "search_web",
+      "label_reason": "2025手册及实际所给资料不能确定2026国庆逐日开放时间，需对应假期官方通知。"
+    },
+    {
+      "case_id": "hybrid-q010",
+      "question_id": "q010",
+      "question": "我现在大二，能申请奖学金吗？",
+      "record_path": "output/evaluation-v1/records/q010.json",
+      "record_sha256": "fdfb9e5a46cf51045e2d2af5bbad5d01600ea80e71aad474c7a6387bda55f1f9",
+      "expected_decision": null,
+      "expected_action": "ask_user",
+      "label_reason": "奖学金种类及必要个人条件未明确；按澄清动作评分，不强行指定证据充分性。"
+    },
+    {
+      "case_id": "keyword-q001",
+      "question_id": "q001",
+      "question": "按照2025版学生手册，学校每年在哪几个月办理学士学位授予？",
+      "record_path": "output/evaluation-keyword-v1/records/q001.json",
+      "record_sha256": "6cdd7798b90bd5d7eff4c75c099662a5f524dd1ac7dfb2baac4cbf852d9b0377",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q002",
+      "question_id": "q002",
+      "question": "学生对学校的处理或者处分决定有异议，应从什么时候起、在多少日内向哪个机构提出什么形式的申诉？",
+      "record_path": "output/evaluation-keyword-v1/records/q002.json",
+      "record_sha256": "5f82ebe09c49e8ada2302218c744d50844a79b4eff9b97f282736f96d9011e89",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q003",
+      "question_id": "q003",
+      "question": "平时上课期间，我在学校做勤工助学，一周最多能干几个小时？一个月呢？",
+      "record_path": "output/evaluation-keyword-v1/records/q003.json",
+      "record_sha256": "2b3774047c813d22cd231358c524b0bf765e9d92af0330684066649cee367f76",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q004",
+      "question_id": "q004",
+      "question": "我是在校本科生，但不具有中华人民共和国国籍，能申请手册里的本专科生国家奖学金吗？",
+      "record_path": "output/evaluation-keyword-v1/records/q004.json",
+      "record_sha256": "d8725f5be5c72345a260a07ef7e716ee4fdeee13e197976945885f02a59c01a1",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q005",
+      "question_id": "q005",
+      "question": "这学期我有一门课正好三分之一的作业没交，其他情况正常，还能参加这门课的期末考试和补考吗？成绩怎么记？",
+      "record_path": "output/evaluation-keyword-v1/records/q005.json",
+      "record_sha256": "9bcea357d247de19462c0592b8d91c2d39627a5fde7e343794a7de34c3fe9f98",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q006",
+      "question_id": "q006",
+      "question": "百分制97分和五级制“良”，对应的课程绩点分别是多少？",
+      "record_path": "output/evaluation-keyword-v1/records/q006.json",
+      "record_sha256": "fa020793608c7eaff55a32832913129f97bad7e4f2426b42afc018d5d68ba5f5",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q007",
+      "question_id": "q007",
+      "question": "我是本校普通本科生，不属于留学生读者类别。图书馆最多能借几本书，借期多少天？每册能续借几天、几次，什么时候办理？",
+      "record_path": "output/evaluation-keyword-v1/records/q007.json",
+      "record_sha256": "a604fe3c029af808ef736240e0aa360967aade5a19b4e9ae89ed558b4721d6a0",
+      "expected_decision": "sufficient",
+      "expected_action": "answer_local",
+      "label_reason": "既有证据组核对完整，足以覆盖用户所问；仅依题目判断，不要求无关扩展。"
+    },
+    {
+      "case_id": "keyword-q008",
+      "question_id": "q008",
+      "question": "我是中国国籍的大二本科生，本学年学习成绩和综合考评排名都在班级前20%，没有不及格科目，获得全国性专业学科竞赛一等奖，其他基本条件均满足。按手册能否申请国家奖学金？需要什么证明，个人申请怎么提交？",
+      "record_path": "output/evaluation-keyword-v1/records/q008.json",
+      "record_sha256": "44b6044703f4db360e5133fee6101d72d3a1c9a898d9d9a45562ac85fb6f19e0",
+      "expected_decision": "partial",
+      "expected_action": "retrieve_local",
+      "label_reason": "实际只有chunk-0157，支持资格与证明；流程chunk-0158缺失，优先本地补查。"
+    },
+    {
+      "case_id": "keyword-q009",
+      "question_id": "q009",
+      "question": "2026年国庆假期，学校图书馆每天具体几点开门、几点闭馆？",
+      "record_path": "output/evaluation-keyword-v1/records/q009.json",
+      "record_sha256": "b31c3fcdd0cb8330191bec7d09c2c056eab4c41df219eed336ef5e1ed1b8ef2e",
+      "expected_decision": "insufficient",
+      "expected_action": "search_web",
+      "label_reason": "2025手册及实际所给资料不能确定2026国庆逐日开放时间，需对应假期官方通知。"
+    },
+    {
+      "case_id": "keyword-q010",
+      "question_id": "q010",
+      "question": "我现在大二，能申请奖学金吗？",
+      "record_path": "output/evaluation-keyword-v1/records/q010.json",
+      "record_sha256": "be4f930f85dacb43a94aaeb3652e3418e360801edd67dd490674474815536015",
+      "expected_decision": null,
+      "expected_action": "ask_user",
+      "label_reason": "奖学金种类及必要个人条件未明确；按澄清动作评分，不强行指定证据充分性。"
+    }
+  ]
+}

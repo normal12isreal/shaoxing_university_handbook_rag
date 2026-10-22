@@ -9,6 +9,8 @@ import re
 import sys
 
 if __package__:
+    from .adaptive_routing import apply_adaptive_routing
+    from .answer_reflection import reflect_answer
     from .context_expansion import expand_context
     from .crag import apply_crag, load_crag_config
     from .embed_chunks import ROOT, load_config, load_local_credentials
@@ -19,6 +21,8 @@ if __package__:
     from .retrieve_chunks import load_corpus, run_query
     from .web_search import WebSearchClient
 else:
+    from adaptive_routing import apply_adaptive_routing
+    from answer_reflection import reflect_answer
     from context_expansion import expand_context
     from crag import apply_crag, load_crag_config
     from embed_chunks import ROOT, load_config, load_local_credentials
@@ -57,6 +61,8 @@ def main():
                         help='Require cached retrieval; CRAG/web search and answer may still call APIs')
     parser.add_argument('--no-crag', action='store_true', help='Disable evidence assessment and web fallback')
     parser.add_argument('--no-web', action='store_true', help='Evaluate evidence but disable web fallback')
+    parser.add_argument('--legacy-crag', action='store_true', help='Use the original three-way CRAG without adaptive routing')
+    parser.add_argument('--no-reflection', action='store_true', help='Skip draft checking and its possible single revision')
     parser.add_argument('--dry-run', action='store_true',
                         help='Use cached retrieval and save the prompt only; no API calls')
     args = parser.parse_args()
@@ -84,22 +90,43 @@ def main():
     crag_report = {'route': 'disabled' if args.no_crag else 'skipped_dry_run'}
     if not args.no_crag and not args.dry_run:
         crag_config = load_crag_config(ROOT)
-        evaluator = GenerationClient(base_url, key, {**generation, 'model': crag_config['evaluator_model'],
-                                                     'max_completion_tokens': 500})
-        context, crag_report = apply_crag(question, context, evaluator,
-                WebSearchClient(base_url, key, crag_config),
+        def evaluator_factory():
+            return GenerationClient(base_url, key, {**generation, 'model': crag_config['evaluator_model'],
+                                                    'max_completion_tokens': 500 if args.legacy_crag else 900})
+
+        def local_retry(query):
+            retried = run_query(query, chunks, normalized, identity, config,
+                EmbeddingClient(base_url, key, config), ROOT / '.runtime/query-embeddings-v1',
+                top_k=10, offline=args.retrieval_offline,
+                rerank_config=reranking, rerank_client=RerankClient(base_url, key, reranking),
+                rerank_cache_dir=ROOT / '.runtime/reranking-v1')
+            expanded = expand_context([h['chunk_id'] for h in retried['hits']],
+                                      {c['chunk_id']: c for c in chunks}, limits)
+            return expanded, retried
+
+        web = WebSearchClient(base_url, key, crag_config)
+        if args.legacy_crag:
+            context, crag_report = apply_crag(question, context, evaluator_factory(), web,
                 (ROOT / 'config/crag-evaluator-v1.txt').read_text(encoding='utf-8'),
                 allow_web=not args.no_web, max_chars=limits['max_total_chars'])
+        else:
+            context, crag_report = apply_adaptive_routing(question, context, evaluator_factory,
+                (ROOT / 'config/crag-evaluator-v2.txt').read_text(encoding='utf-8'), local_retry, web,
+                allow_web=not args.no_web, max_chars=limits['max_total_chars'])
     messages, sources = build_messages(question, context, system_prompt) if context['chunks'] else ([], [])
+    terminal = crag_report.get('terminal_response')
+    if terminal:
+        messages = []
     if sum(len(m['content']) for m in messages) > generation['max_prompt_chars']:
         raise ValueError('Answer prompt exceeds the configured character limit')
     output = ROOT / 'output/answers-v1'
     output.mkdir(parents=True, exist_ok=True)
-    record = {'schema_version': 2, 'run_at_utc': datetime.now(timezone.utc).isoformat(),
+    record = {'schema_version': 3, 'run_at_utc': datetime.now(timezone.utc).isoformat(),
               'question': question, 'vectors_sha256': receipt['vectors_sha256'],
               'retrieval': retrieval, 'answer_context': context, 'sources': sources,
               'messages': messages, 'generation_config': generation, 'answer_model_used': False,
               'local_context': local_context, 'crag': crag_report,
+              'reflection': {'status': 'skipped_dry_run' if args.dry_run else 'not_started'},
               'status': 'prepared' if args.dry_run else 'pending'}
     # Save the exact evidence and prompt before sending; failures retain an inspectable record.
     write_json(output / 'last_run.json', record)
@@ -115,8 +142,19 @@ def main():
             write_json(output / 'last_run.json', record)
             raise
     else:
-        result = {'answer': '现有资料没有提供足够依据，暂时无法确定这个问题的答案。',
-                  'complete': True, 'usage': {}, 'response_model': None, 'finish_reason': 'no_evidence'}
+        result = {'answer': terminal or '现有资料没有提供足够依据，暂时无法确定这个问题的答案。',
+                  'complete': True, 'usage': {}, 'response_model': None,
+                  'finish_reason': crag_report['route'] if terminal else 'no_evidence'}
+    record.update(draft_generation=result, generation_http_attempts=client.attempts, status='draft_ready')
+    write_json(output / 'last_run.json', record)
+    if messages and result['complete'] and not args.no_reflection:
+        result, reflection = reflect_answer(question, context, result,
+            GenerationClient(base_url, key, {**generation, 'max_completion_tokens': 1000}),
+            lambda: GenerationClient(base_url, key, generation),
+            (ROOT / 'config/answer-reflection-v1.txt').read_text(encoding='utf-8'), messages, citation_audit)
+        record['reflection'] = reflection
+    else:
+        record['reflection'] = {'status': 'disabled' if args.no_reflection else 'skipped_no_complete_draft'}
     record.update(status='completed' if result['complete'] else 'truncated', answer_model_used=bool(messages),
                   generation_http_attempts=client.attempts, generation=result,
                   citation_audit=citation_audit(result['answer'], len(sources)))
@@ -135,10 +173,15 @@ def main():
             else:
                 pages = '、'.join(map(str, source['pdf_pages']))
                 print(f'[{source["label"]}] {title}；PDF 第 {pages} 页')
-    print(f'\n回答模型：{result["response_model"] or "未调用（依据不足）"}；本次生成用量：{result["usage"]}')
+    model_used = result['response_model'] or record['draft_generation'].get('response_model') or '未调用'
+    print(f'\n回答模型：{model_used}；最终生成响应的用量：{result["usage"]}')
     if 'assessment' in crag_report:
         print(f'CRAG：{crag_report["assessment"]["decision"]}；联网：{crag_report["web_search"]["status"]}')
         print(f'评估用量：{crag_report["evaluator_usage"]}；联网用量：{crag_report["web_search"].get("usage", {})}')
+    if 'assessments' in crag_report:
+        last = crag_report['assessments'][-1]['assessment']
+        print(f'证据判断：{last["decision"]}；执行路由：{crag_report["route"]}；联网：{crag_report["web_search"]["status"]}')
+    print(f'草稿复核：{record["reflection"]["status"]}')
     if not result['complete']:
         print('回答达到输出上限，结果不完整；未自动继续请求。')
     if audit['unknown_numbers'] or (messages and not audit['has_citations']):
@@ -147,6 +190,7 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8')
     try:
         main()
     except KeyboardInterrupt:

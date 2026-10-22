@@ -249,15 +249,15 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 `config/answer-system-v1.txt` 是可直接修改的系统提示词，要求依证据回答、区分相似政策、保留数字和例外、资料不足时明确说明，并把资料里的指令当作参考文字。关键结论需给出制度名称、已有条款及支持结论的关键原文，再标注 `[资料N]`，不能只给编号；未出现的条号不得编造。无关资料直接忽略，不在答案末尾解释排除了哪些资料。终端末尾的“引用来源”只展示回答实际引用的资料名称和物理 PDF 页码。用户消息用 JSON 明确填写问题、补读状态及来源列表；每条来源包含编号、原文、分块 ID、文件和物理 PDF 页码。不把向量、相似度、解析器版面字段传入 LLM。
 
-`config/generation-v1.json` 配置 `qwen3.7-plus`、`enable_thinking=false`、温度 0.1、最多 2500 输出 Token、超时 60 秒，总提示词最多 16000 字符。`scripts/generation_api.py` 沿用现有 Key 和兼容 Base URL，向 `/chat/completions` 发送一次非流式请求；不依赖额外 SDK。每次运行最多一个生成 HTTP 尝试，不自动重试、续写或切换模型；达到输出上限保留文本但标记 `truncated`，失败显式停止。接口依据：[百炼 Chat Completions](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)。
+`config/generation-v1.json` 配置 `qwen3.7-plus`、`enable_thinking=false`、温度 0.1、最多 2500 输出 Token、超时 60 秒，总提示词最多 16000 字符。`scripts/generation_api.py` 沿用现有 Key 和兼容 Base URL，向 `/chat/completions` 发送一次非流式请求；不依赖额外 SDK。每个生成阶段最多一个 HTTP 尝试，不自动重试、续写或切换模型；新版流程另有证据评估、草稿复核及至多一次改写，见后文；达到输出上限保留文本但标记 `truncated`，失败显式停止。接口依据：[百炼 Chat Completions](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)。
 
 发送前将准确提示词与来源保存到 `output/answers-v1/last_run.json`，成功后补入未经改写的回答、实际模型、用量、完成状态和引用编号检查。失败保留 `generation_failed` 状态及尝试次数。目录被 Git 忽略；不保存密钥。生成答案暂不缓存，重新执行通常会再请求一次 LLM；只有查询向量和重排自动复用缓存。引用检查只核对 `[资料N]` 编号是否存在，不自动证明每项结论都有对应依据。
 
 2026-10-20 首次实际问题为“申请国家奖学金，需要满足哪些条件？”。查询和重排均从缓存读取，生成恰好一次，报告输入 1943、输出 682、总计 2625 Token，正常结束未截断。实际送入 5 块、2173 原文字符，无新增关联块；回答引用资料 1（0157，PDF 147–148 页）与资料 2（0156，PDF 146–147 页），整合了国籍年级与成绩要求，并明确未采用混入的其他奖项条件。对照这两块原文抽查了 10%/30%、无不及格、审核盖章与突出表现标准。此为单例功能验证，不代表答案完整性或准确率已评测。
 
-## 单条关键词补充与简化 CRAG（2026-10-21）
+## 初版：单条关键词补充与简化 CRAG（2026-10-21）
 
-默认流程：向量 Top-10 + BM25 Top-1 → 去重 → 对最多 11 个候选重排 → 保留 Top-5 → 按已有关系补读 → 评估依据 → 必要时联网补一块 → 生成答案。关键词命中与向量结果重复时不再找第二条；不使用 RRF，不改动已有分块和文档向量。首次运行可能因候选集合变化重新请求一次重排。
+初版流程（`--legacy-crag`保留）：向量 Top-10 + BM25 Top-1 → 去重 → 对最多 11 个候选重排 → 保留 Top-5 → 按已有关系补读 → 评估依据 → 必要时联网补一块 → 生成答案。关键词命中与向量结果重复时不再找第二条；不使用 RRF，不改动已有分块和文档向量。首次运行可能因候选集合变化重新请求一次重排。
 
 `scripts/keyword_retrieval.py` 是内存中的小型 BM25 索引，不增加第三方依赖或数据库。中文使用重叠二元词组，英文与数字使用整词。BM25 与向量分数不直接相加，合并候选交给同一重排模型判断。
 
@@ -286,7 +286,7 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 .\.venv\Scripts\python.exe .\scripts\answer_question.py --no-crag
 ```
 
-`--dry-run` 跳过评估、联网和生成，完全不调用 API，但要求当前候选对应的检索缓存已存在。`--retrieval-offline` 仅限制检索；评估、必要的联网和生成仍可能调用 API。相比原流程，每个问题通常多一次评估请求，资料不足时最多再多一次联网请求；回答模型仍最多请求一次。额外步骤也会产生用量，当前未查询账户余额或建立人民币硬限额。
+`--dry-run` 跳过评估、联网和生成，完全不调用 API，但要求当前候选对应的检索缓存已存在。`--retrieval-offline` 仅限制检索；评估、必要的联网、生成及新版草稿复核仍可能调用 API。相比原流程，每个问题通常多一次评估请求，资料不足时最多再多一次联网请求；回答模型仍最多请求一次。额外步骤也会产生用量，当前未查询账户余额或建立人民币硬限额。
 
 实测“我不是中国人，我可以拿国家奖学金吗”：评估 `sufficient`，零联网请求，答案引用第七条及 PDF 146、147 页。实测“学校在2026年是否更名为绍兴大学？请给出官方依据。”：关键词新增 1 块，11 个候选重排后返回 5 块；评估 `insufficient`，执行一次联网 HTTP 请求，最终只使用一块带教育部链接的摘要生成答案。也观察到联网结果混入第三方引用时保守拒答的行为，随后收紧了搜索提示。此为分支功能检查，不是准确率测量。
 
@@ -333,3 +333,42 @@ q002还命中了原标注之外、内容等价的手册附录条款，复核后�
 对照报告：`output/evaluation-keyword-v1/comparison.txt`（另有JSON）；详细答案和扣分记录：同目录`report.txt`；固定复核记录：`data/evaluation/sample-v1/keyword_answer_reviews.json`。原题目、评分规则、手册和索引均未修改。关键词组没有查询向量API调用，实际10次重排、10次生成；单候选重排不能找回缺失资料。
 
 候选由最多11条减少到1条，因此这是移除向量路线的消融，不是相同Top-K预算的算法比较；未更换或刻意降低生成模型。每组只生成一次，未估计生成波动。重新生成须使用新输出目录，并针对新回答重新复核，旧复核文件不能套用。增加实验模式后程序哈希变化，原基线目录保留历史结果；要重新跑混合组须另选目录，例如`--output output/evaluation-hybrid-v2`。
+
+## CRAG独立评估、自适应路由与草稿复核
+
+现在`answer_question.py`默认执行：混合召回与重排 → 关联补读 → 证据评估及路由 → 生成草稿 → 依据复核 → 必要时修改一次。结构化协议在`evidence_assessment.py`，动作执行在`adaptive_routing.py`，草稿复核在`answer_reflection.py`。原`crag.py`保留兼容入口。
+
+新版提示词`config/crag-evaluator-v2.txt`把证据充分性与问题明确程度分开：充分则本地回答；手册可能缺一块则本地补查；需要新年份事实则查官方来源；用户缺少奖种等必要信息则追问；无可靠依据则说明无法确定。`complete`只反映已知关系补读完成，不能代替语义完整性判断。
+
+最多一轮本地补查、补查后一次重新评估、一次联网。补查复用原向量10＋关键词1及重排，补查与初始资料去重后总计最多12块、6000字符，完整块取舍不截断。补查后仍要求本地检索时不循环，依据部分有效则有限回答，否则拒答；评估协议非法或请求失败时暂停回答。联网仍只接受已有官方域名过滤器返回的一块摘要，域名过滤和模型复核都不等于事实保证。
+
+`config/answer-reflection-v1.txt`检查实际草稿的数字、条件、适用对象、漏答和引用。最多一次检查、一次改写，保存草稿、检查输入输出及修订文本；未知引用编号会阻止发布。修改后状态为`revised_not_rechecked`，明确未做第二轮语义复核；检查失败或修订不完整则返回无法可靠作答。追问、拒答等没有事实草稿的终止路径不调用复核器。这是普通LLM草稿复核，不是Self-RAG论文的训练与反思Token实现。
+
+```powershell
+# 默认开启新版路由和草稿复核
+.\.venv\Scripts\python.exe .\scripts\answer_question.py
+# 不联网；仍可补查本地、追问、复核
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --no-web
+# 对照原版CRAG；或单独关闭草稿复核
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --legacy-crag --no-reflection
+# 完全关闭证据评估、路由和草稿复核，保留原检索生成
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --no-crag --no-reflection
+# 纯准备，无API请求，要求检索缓存已存在
+.\.venv\Scripts\python.exe .\scripts\answer_question.py --dry-run
+```
+
+正常一次问答通常增加证据评估和草稿复核两个请求；复杂路径最多2次评估、1次草稿生成、1次复核、1次改写，另有初始检索、最多一轮补查及一次联网的请求。每个生成客户端仍只尝试一次。`--retrieval-offline`也约束补查检索；新补查没有缓存时停止，不暗中联网。schema_version=3记录每个评估、补查、路由、草稿和复核结果；终端仅显示最终答复及简要状态。
+
+独立评估复用原10题的混合、关键词两组上下文，共20份。标签在`data/evaluation/sample-v1/crag_cases.json`，在调用前建立，不传给模型；模型只接收问题与原文。18份参与充分性评分，2份模糊奖学金问题按澄清动作评分。该评估只看证据判断和推荐动作，不执行补查、联网、回答或反思。
+
+```powershell
+# 当前修正版20份独立判断；相同版本完成记录会复用，不重复收费
+.\.venv\Scripts\python.exe .\scripts\evaluate_crag.py --version adaptive --output output/evaluation-crag-adaptive-v2
+# 修改提示词或代码后需另选输出目录，例如output/evaluation-crag-adaptive-v3
+# 两个已有问题的补查/复核演示；执行过的目录会拒绝重复调用
+.\.venv\Scripts\python.exe .\scripts\demo_adaptive.py --output output/evaluation-adaptive-examples-v2
+```
+
+2026-10-22：旧版充分性18/18、动作17/20，未追问且缺流程时直接联网。新版首轮出现2次过度拦截及1份矛盾输出被拒收；修正“不得自行增加用户未问的细节”后，充分性18/18、动作20/20。三个版本全部保留。该提示词在同组题上调整，属于开发验证，不能作为独立测试准确率。
+
+实际补查示例将q008证据组从2/3补齐至3/3，零联网；实际入口对q010追问奖种，未调用回答模型；受控写反q003周/月工时的错误草稿被发现并改为每周8、每月40小时。受控错误是人为注入，不冒充真实回答故障。汇总报告：`output/evaluation-crag-summary-v1/report.txt`；各版本记录与实际演示分别在`output/evaluation-crag-*/`、`output/evaluation-adaptive-examples-v1/`。
