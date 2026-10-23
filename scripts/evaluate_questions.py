@@ -102,7 +102,8 @@ def execute(output, limit, retrieval_mode='hybrid'):
     by_id = {c['chunk_id']: c for c in chunks}
     limits = json.loads((ROOT / 'config/table-context-v1.json').read_text(encoding='utf-8'))['expansion']
     prompt = (ROOT / 'config/answer-system-v1.txt').read_text(encoding='utf-8')
-    source_names = ['answer_question.py', 'context_expansion.py', 'retrieve_chunks.py',
+    source_names = ['answer_question.py', '../student_handbook_rag/prompts.py',
+                    'context_expansion.py', 'retrieve_chunks.py',
                     'rerank_chunks.py', 'keyword_retrieval.py', 'generation_api.py',
                     'embedding_api.py', 'rerank_api.py', 'evaluate_questions.py']
     basis = {'questions_sha256': manifest['questions_sha256'],

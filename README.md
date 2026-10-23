@@ -372,3 +372,60 @@ q002还命中了原标注之外、内容等价的手册附录条款，复核后�
 2026-10-22：旧版充分性18/18、动作17/20，未追问且缺流程时直接联网。新版首轮出现2次过度拦截及1份矛盾输出被拒收；修正“不得自行增加用户未问的细节”后，充分性18/18、动作20/20。三个版本全部保留。该提示词在同组题上调整，属于开发验证，不能作为独立测试准确率。
 
 实际补查示例将q008证据组从2/3补齐至3/3，零联网；实际入口对q010追问奖种，未调用回答模型；受控写反q003周/月工时的错误草稿被发现并改为每周8、每月40小时。受控错误是人为注入，不冒充真实回答故障。汇总报告：`output/evaluation-crag-summary-v1/report.txt`；各版本记录与实际演示分别在`output/evaluation-crag-*/`、`output/evaluation-adaptive-examples-v1/`。
+
+## 作为 Python 包供其他程序调用
+
+公开入口是 `from student_handbook_rag import HandbookRAG, ModelAPIError`。无需启动服务。使用调用方的 Python 环境执行一次本地安装：
+
+```powershell
+python -m pip install -e "D:\all_try\codex_try\student-handbook-rag"
+```
+
+本项目的 `.venv` 已安装；如果另一个程序使用其他虚拟环境，在那个环境中执行上述命令。问答运行部分只依赖 Python 3.11+ 标准库，无需额外安装 MinerU 或 Web 框架。安装内容是 Python 代码，现有知识库、向量、配置和凭据仍由 `project_dir` 指向的项目目录提供；换机器时也要准备这些数据及该环境的凭据，安装包本身不携带密钥和语料。
+
+```python
+from student_handbook_rag import HandbookRAG, ModelAPIError
+
+# 启动时初始化一次：校验索引、加载配置和向量，不发模型请求。
+rag = HandbookRAG(r"D:\all_try\codex_try\student-handbook-rag")
+
+try:
+    result = rag.ask("我不是中国人，我可以拿国家奖学金吗", allow_web=False)
+except ModelAPIError as error:
+    print(f"模型请求失败：{error}")
+else:
+    print(result["answer"])
+    print(result["status"])
+    for source in result["sources"]:
+        print(source["label"], source["pdf_pages"], source["text"])
+
+# 后续问题复用同一个实例；每次调用重新创建请求客户端，不继承上次请求次数。
+# another = rag.ask("图书最多可以续借几次？")
+```
+
+`ask` 为同步阻塞函数，返回可 JSON 序列化的字典，不自行打印。完整示例在 `examples/use_package.py`。相对当前工作目录没有要求；初始化的索引和配置在实例生命周期内复用，重建知识库或修改配置后请重新创建实例。
+
+| 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `allow_web` | `True` | 是否允许原有官方来源联网分支；关闭后仍可本地补查或追问 |
+| `crag` | `True` | 是否执行证据判断与自适应路由 |
+| `reflection` | `True` | 是否检查草稿，并在需要时最多修订一次 |
+| `retrieval_offline` | `False` | 检索只用已有缓存；评估、生成、复核等仍可能调用 API |
+
+默认保留混合召回、重排、表格关联补读、CRAG、自适应路由及草稿复核。构造器默认沿用 `DASHSCOPE_API_KEY` / `DASHSCOPE_BASE_URL` 环境变量或 `.runtime/dashscope.local.json`，也可显式传入 `api_key=`、`base_url=`；接口地址仍须匹配当前向量索引身份。
+
+| 返回字段 | 含义 |
+| --- | --- |
+| `answer`、`question` | 最终答复及本次问题 |
+| `status` | `answered`、`partial_answer`、`needs_clarification`、`abstained`、`incomplete` 或 `unverified` |
+| `sources` | 最终答案实际引用的资料：编号、原文、块ID、PDF页码；联网资料另含链接 |
+| `route`、`reflection` | 实际执行路由与草稿复核状态，保留 `revised_not_rechecked` 等原始状态 |
+| `complete`、`warnings` | 输出是否完整，以及引用编号异常等提醒 |
+| `usage` | 分阶段 HTTP 尝试数、返回的 Token 用量及其合计；缓存命中不重复计入，不是账单对账结果 |
+| `request_id`、`elapsed_seconds`、`record_path` | 本次记录标识、执行耗时、完整本地记录位置 |
+
+追问、依据不足和复核后拒答均正常返回，调用方按 `status` 处理；每次调用独立，后续补充信息需要组成新问题再次提交。模型/网络异常抛出 `ModelAPIError`，输入或配置异常抛出 `ValueError`，本地文件异常抛出 `OSError`。
+
+每个问题独立保存在 `output/answers-v1/runs/<request_id>.json`，同时更新原终端入口使用的 `last_run.json`。`HandbookRAG(..., save_records=False)` 可关闭问答记录保存，此时 `record_path=None`，检索缓存仍正常读写。同一实例内的调用串行执行；本地缓存面向单进程单实例使用，多程序并发共享同一数据目录尚未支持。
+
+验证：54项相关离线检查通过，覆盖原链路及导入调用、连续问答、追问/拒答、修订用量、异常恢复和独立记录。从项目外目录导入后实测国家奖学金问题，返回 `answered / local / passed`，实际引用 PDF 146、147 页；检索命中缓存，执行评估、生成、复核各1次，零联网。

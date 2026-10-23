@@ -39,12 +39,16 @@ def load_config(root: Path) -> dict:
     return config
 
 
-def load_local_credentials(root: Path) -> tuple[str, str]:
+def load_local_credentials(root: Path, *, api_key: str | None = None,
+                           base_url: str | None = None) -> tuple[str, str]:
     path = root / '.runtime/dashscope.local.json'
-    local = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
-    key = os.environ.get('DASHSCOPE_API_KEY') or local.get('api_key', '')
-    base_url = os.environ.get('DASHSCOPE_BASE_URL') or local.get('base_url', '')
-    return key.strip(), validate_base_url(base_url.strip())
+    local = (json.loads(path.read_text(encoding='utf-8'))
+             if (api_key is None or base_url is None) and path.exists() else {})
+    key = api_key if api_key is not None else os.environ.get('DASHSCOPE_API_KEY') or local.get('api_key', '')
+    url = base_url if base_url is not None else os.environ.get('DASHSCOPE_BASE_URL') or local.get('base_url', '')
+    if not isinstance(key, str) or not isinstance(url, str):
+        raise ValueError('API key and base URL must be strings')
+    return key.strip(), validate_base_url(url.strip())
 
 
 def load_source(root: Path, config: dict):
