@@ -41,6 +41,10 @@ class HandbookRAG:
         self.reranking = {**load_rerank_config(self.project_dir), 'max_requests_per_run': 3}
         self._key, self._base_url = load_local_credentials(
             self.project_dir, api_key=api_key, base_url=base_url)
+        if not self._key or any(character.isspace() for character in self._key):
+            raise ValueError(
+                'Missing or invalid DashScope API key. Fill in api_key in '
+                '.runtime/dashscope.local.json or set DASHSCOPE_API_KEY. See README.md.')
         self.chunks, self.normalized, self.identity, self.receipt = load_corpus(
             self.project_dir, self.embedding, self._base_url)
         self.limits = json.loads((self.project_dir / 'config/table-context-v1.json').read_text(

@@ -12,7 +12,7 @@ import sys
 if __package__:
     from .context_expansion import expand_context
     from .embed_chunks import ROOT, OUTPUT, identity_for, load_config, load_local_credentials, load_source
-    from .embedding_api import ApiFailure, EmbeddingClient, validate_response
+    from .embedding_api import ApiFailure, EmbeddingClient, validate_base_url, validate_response
     from .embedding_store import saved_batches, sha256, write_json
     from .rerank_api import RerankClient, load_rerank_config
     from .rerank_chunks import rerank_hits
@@ -20,7 +20,7 @@ if __package__:
 else:
     from context_expansion import expand_context
     from embed_chunks import ROOT, OUTPUT, identity_for, load_config, load_local_credentials, load_source
-    from embedding_api import ApiFailure, EmbeddingClient, validate_response
+    from embedding_api import ApiFailure, EmbeddingClient, validate_base_url, validate_response
     from embedding_store import saved_batches, sha256, write_json
     from rerank_api import RerankClient, load_rerank_config
     from rerank_chunks import rerank_hits
@@ -56,11 +56,18 @@ def cosine_top_k(query: list[float], normalized_documents: list[list[float]], ch
 
 
 def load_corpus(root: Path, config: dict, base_url: str):
+    base_url = validate_base_url(base_url)
     chunks, source_sha = load_source(root, config)
-    basis, identity = identity_for(source_sha, config, base_url)
     output = root / OUTPUT
     manifest = json.loads((output / 'manifest.json').read_text(encoding='utf-8'))
     receipt = json.loads((output / 'run.json').read_text(encoding='utf-8'))
+    stored_basis = manifest.get('basis')
+    if not isinstance(stored_basis, dict) or not isinstance(stored_basis.get('base_url'), str):
+        raise ValueError('Corpus manifest is missing its original DashScope endpoint')
+    # Verify the original source/model/endpoint receipt before reusing the index.
+    # Supported Beijing DashScope endpoints share the same pinned embedding model.
+    stored_url = validate_base_url(stored_basis['base_url'])
+    basis, identity = identity_for(source_sha, config, stored_url)
     if (manifest != {'schema_version': 1, 'basis': basis, 'identity': identity}
             or receipt.get('identity') != identity or receipt.get('basis') != basis
             or receipt.get('status') != 'completed' or receipt.get('completed_chunks') != len(chunks)
@@ -76,7 +83,9 @@ def load_corpus(root: Path, config: dict, base_url: str):
     if records != [record for batch in batches for record in batch['records']]:
         raise ValueError('Vector export differs from ordered source batches')
     normalized = [unit_vector(record['embedding'], config['dimensions']) for record in records]
-    return chunks, normalized, identity, receipt
+    # Keep query/rerank caches separate when the caller switches endpoints.
+    _, query_identity = identity_for(source_sha, config, base_url)
+    return chunks, normalized, query_identity, receipt
 
 
 def query_vector(question: str, identity: str, config: dict, cache_dir: Path, client, *, offline=False):

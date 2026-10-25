@@ -8,6 +8,14 @@ __pycache__/
 build/
 dist/
 output/embeddings*/
+!output/embeddings-v1/
+output/embeddings-v1/*
+!output/embeddings-v1/manifest.json
+!output/embeddings-v1/run.json
+!output/embeddings-v1/vectors.jsonl
+!output/embeddings-v1/batches/
+output/embeddings-v1/batches/*
+!output/embeddings-v1/batches/*.json
 output/retrieval*/
 output/answers*/
 output/evaluation*/
