@@ -152,6 +152,22 @@ class PackageTests(unittest.TestCase):
         (self.root / '.runtime/dashscope.local.json').write_text('invalid JSON', encoding='utf-8')
         self.assertEqual(load_local_credentials(self.root, api_key='explicit', base_url=url), ('explicit', url))
 
+    def test_missing_endpoint_points_to_configuration_without_creating_files(self):
+        with patch.dict('os.environ', {}, clear=True):
+            with self.assertRaisesRegex(ValueError, 'config/dashscope.example.json'):
+                load_local_credentials(self.root)
+        self.assertFalse((self.root / '.runtime').exists())
+
+    def test_missing_key_stops_before_loading_index_or_calling_models(self):
+        for key in ('', 'invalid key'):
+            with self.subTest(key=key):
+                with patch('student_handbook_rag.client.load_local_credentials',
+                           return_value=(key, 'https://dashscope.aliyuncs.com/compatible-mode/v1')):
+                    with self.assertRaisesRegex(ValueError, 'DashScope API key'):
+                        HandbookRAG(self.root)
+        self.corpus.assert_not_called()
+        self.assertEqual(self.clients, [])
+
 
 if __name__ == '__main__':
     unittest.main()

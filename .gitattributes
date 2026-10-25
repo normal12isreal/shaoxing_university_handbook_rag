@@ -4,3 +4,9 @@
 *.png binary
 # Frozen evaluation input is byte-hashed; preserve its original UTF-8 bytes.
 data/evaluation/sample-v1/questions.jsonl -text -eol whitespace=cr-at-eol
+# Reviewed source bytes are referenced by the existing chunk/index receipts.
+data/table_reviews.json -text -eol whitespace=cr-at-eol
+output/reviewed-v1/document.json -text -eol whitespace=cr-at-eol
+output/reviewed-v1/tables.json -text -eol whitespace=cr-at-eol
+# Index receipts hash exact bytes; cloning must not rewrite line endings.
+output/embeddings-v1/** -text -eol

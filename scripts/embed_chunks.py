@@ -48,6 +48,11 @@ def load_local_credentials(root: Path, *, api_key: str | None = None,
     url = base_url if base_url is not None else os.environ.get('DASHSCOPE_BASE_URL') or local.get('base_url', '')
     if not isinstance(key, str) or not isinstance(url, str):
         raise ValueError('API key and base URL must be strings')
+    if not url.strip():
+        raise ValueError(
+            'Missing DashScope base URL. Copy config/dashscope.example.json to '
+            '.runtime/dashscope.local.json and fill in api_key and base_url, '
+            'or set DASHSCOPE_API_KEY and DASHSCOPE_BASE_URL. See README.md.')
     return key.strip(), validate_base_url(url.strip())
 
 

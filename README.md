@@ -1,5 +1,42 @@
 # 学生手册 RAG 学习项目
 
+## 下载后快速使用
+
+本项目是可直接导入的 Python 问答包，无需启动后台服务、网页或编译可执行程序。仓库附带手册分块和 266 个文档向量，首次使用无需重新解析 PDF 或生成文档向量。
+
+需要 Python 3.11+。在下载后的项目根目录执行：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+New-Item -ItemType Directory -Path .runtime -Force | Out-Null
+# 仅在尚无本地配置时复制，保留已有密钥。
+if (-not (Test-Path .runtime/dashscope.local.json)) {
+    Copy-Item config/dashscope.example.json .runtime/dashscope.local.json
+}
+```
+
+打开 `.runtime/dashscope.local.json`，只填写自己的 API 密钥和请求地址：
+
+```json
+{
+  "api_key": "填写你自己的 API Key",
+  "base_url": "填写你自己的百炼北京区域请求地址"
+}
+```
+
+请求地址可为 `https://dashscope.aliyuncs.com/compatible-mode/v1`，或你的百炼北京工作空间提供的 `https://<工作空间域名前缀>.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。使用与该地址匹配的 Key，不要追加 `/chat/completions`。当前仅支持这些百炼北京区域端点，并沿用 `config/` 中现有的模型设置，不支持任意厂商网址。也可以通过 `DASHSCOPE_API_KEY`、`DASHSCOPE_BASE_URL` 环境变量或构造器参数提供这两项。
+
+配置完成后运行：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/answer_question.py --question "申请国家奖学金需要满足哪些条件？" --no-web
+```
+
+`--no-web` 关闭网页补查；提问仍会调用查询向量、重排、证据判断、回答和复核等模型接口，可能产生服务费用。每次运行完成即可退出。配置缺失时会提示文件位置，不弹窗、不自动索取密钥。直接 Python 调用示例见文末“作为 Python 包供其他程序调用”。仅体验问答无需运行安装 MinerU 的 `scripts/setup.ps1`；后面的解析与评测章节用于开发和重建知识库。
+
+真实凭据保存在被 Git 忽略的 `.runtime/`，配置模板 `config/dashscope.example.json` 只有空值。随仓库提供 `output/embeddings-v1/` 的向量、批次和校验记录；锁文件、临时文件、个人查询缓存及问答记录不上传。索引读取时校验原始分块、模型、维度与文件哈希，允许更换上述受支持请求地址，查询缓存按地址隔离。更换模型或语料需要另建索引；向量生成/续跑仍要求与其生成时的地址及配置一致。
+
 目前已完成文档解析、表格校对、程序化分块、表格上下文关联和266块向量化，并接入混合检索、重排、带引用的答案生成及CRAG。固定10题基线评测与运行入口见文末“固定10题评测”。
 
 ## 当前结果
@@ -137,7 +174,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract.ps1 -Outpu
 
 `scripts/embed_chunks.py` 使用 Python 标准库发送 HTTPS 请求，不需要额外安装 SDK。2026-10-20 使用用户提供的北京业务空间地址，进行了两次同一短句的连通测试（一次直接请求、一次经正式客户端），每次均返回 `qwen3.7-text-embedding` 的 1024 维向量，各报告 21 Token，合计 42 Token。本轮未发送手册分块，未执行整本向量化。正式客户端的最近一次连通检查约 0.25 秒，单次观测不代表批量吞吐。
 
-用户提供的 API Key 和 Base URL 已存入 `.runtime/dashscope.local.json`，仅在本地保存且被 Git 忽略；程序和运行记录均不写出密钥。环境变量 `DASHSCOPE_API_KEY`、`DASHSCOPE_BASE_URL` 可分别覆盖本地设置。迁移机器时自行配置这两项，不能仅复制仓库后期待密钥也在其中。
+API Key 和 Base URL 由使用者自行填写到 `.runtime/dashscope.local.json`，仅在本地保存且被 Git 忽略；空值模板见 `config/dashscope.example.json`。程序和运行记录均不写出密钥。环境变量 `DASHSCOPE_API_KEY`、`DASHSCOPE_BASE_URL` 可分别覆盖本地设置。迁移机器时自行配置这两项，不能仅复制仓库后期待密钥也在其中。
 
 在 PowerShell 执行：
 
@@ -168,7 +205,7 @@ Set-Location 'D:\all_try\codex_try\student-handbook-rag'
 
 参数在 `config/embedding-v1.json`。默认 1024 维、每批 10 条，超时 30 秒，瞬时网络错误、429 和部分 5xx 最多尝试 3 次，401/403 等直接停止。每次运行最多 90 次 HTTP 尝试；输入还受 1000 块、每块 2000 字符、总量 20 万字符的代码上限约束，超限在发送前报错。这些是请求与输入上限，不是账户人民币消费硬限额，也没有查询账户余额。API 格式和模型参数来源：[百炼向量同步接口](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)。
 
-如果输入、服务地址、模型、维度或批大小变化，原目录会拒绝继续混写。可以用 `--output output/embeddings-v2` 另存一版；这会重新请求新目录中尚无的全部向量。未来用户问题必须采用与文档相同的模型与维度，按模型推荐的查询编码方式生成查询向量。生成的向量目录被 Git 忽略，避免大量浮点数据进入代码提交；原分块和可复现规则仍受版本控制。
+如果输入、服务地址、模型、维度或批大小变化，原目录会拒绝继续混写。可以用 `--output output/embeddings-v2` 另存一版；这会重新请求新目录中尚无的全部向量。未来用户问题必须采用与文档相同的模型与维度，按模型推荐的查询编码方式生成查询向量。已完成的 `output/embeddings-v1/` 索引及必要校验文件随仓库提供，其他向量输出目录默认被 Git 忽略；原分块和可复现规则仍受版本控制。
 
 ## 实际问题检索：向量 10 块 + 关键词 1 块，去重后重排返回 5 块
 
@@ -412,7 +449,7 @@ else:
 | `reflection` | `True` | 是否检查草稿，并在需要时最多修订一次 |
 | `retrieval_offline` | `False` | 检索只用已有缓存；评估、生成、复核等仍可能调用 API |
 
-默认保留混合召回、重排、表格关联补读、CRAG、自适应路由及草稿复核。构造器默认沿用 `DASHSCOPE_API_KEY` / `DASHSCOPE_BASE_URL` 环境变量或 `.runtime/dashscope.local.json`，也可显式传入 `api_key=`、`base_url=`；接口地址仍须匹配当前向量索引身份。
+默认保留混合召回、重排、表格关联补读、CRAG、自适应路由及草稿复核。构造器默认沿用 `DASHSCOPE_API_KEY` / `DASHSCOPE_BASE_URL` 环境变量或 `.runtime/dashscope.local.json`，也可显式传入 `api_key=`、`base_url=`；接口地址支持前述百炼北京区域端点，索引仍严格校验原始模型、维度、分块和文件完整性。
 
 | 返回字段 | 含义 |
 | --- | --- |
